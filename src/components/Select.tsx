@@ -13,7 +13,7 @@ export function SelectTrigger({
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        "inline-flex h-8 items-center justify-between gap-2 rounded-md border border-white/30 bg-black/40 px-3 text-sm text-white outline-none focus-visible:ring-2 focus-visible:ring-white/70",
+        "inline-flex h-8 items-center justify-between gap-2 rounded-md border border-white/10 bg-white/10 px-3 text-sm text-white backdrop-blur-md outline-none focus-visible:ring-2 focus-visible:ring-white/70",
         className,
       )}
       {...props}
@@ -48,7 +48,7 @@ export function SelectContent({
         position={position}
         sideOffset={sideOffset}
         className={cn(
-          "z-50 min-w-(--radix-select-trigger-width) overflow-hidden rounded-md border border-white/15 bg-neutral-950 p-1 text-white shadow-lg",
+          "z-50 max-h-64 min-w-(--radix-select-trigger-width) overflow-y-auto rounded-2xl border border-white/10 bg-white/10 p-1 text-white shadow-lg backdrop-blur-md backdrop-brightness-50",
           className,
         )}
         {...props}

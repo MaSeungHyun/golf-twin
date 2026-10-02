@@ -1,9 +1,6 @@
 import { Suspense } from "react";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router";
-import ClubHud from "./Hud/ClubHud";
-import GameHud from "./Hud/GameHud";
-import HomeHud from "./Hud/HomeHud";
-import LanguageSwitch from "./i18n/LanguageSwitch";
+import { BrowserRouter, Route, Routes } from "react-router";
+import AppHud from "./Hud/AppHud";
 import Viewport from "./Viewport/Viewport";
 
 function ViewportLayout() {
@@ -12,8 +9,7 @@ function ViewportLayout() {
       <Suspense fallback={null}>
         <Viewport />
       </Suspense>
-      <LanguageSwitch />
-      <Outlet />
+      <AppHud />
     </main>
   );
 }
@@ -23,9 +19,9 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<ViewportLayout />}>
-          <Route index element={<HomeHud />} />
-          <Route path="club" element={<ClubHud />} />
-          <Route path="game" element={<GameHud />} />
+          <Route index element={null} />
+          <Route path="club" element={null} />
+          <Route path="game" element={null} />
         </Route>
       </Routes>
     </BrowserRouter>

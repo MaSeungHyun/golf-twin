@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/Select";
 import { locales, type Locale, type MessageKey } from "./messages";
+import { cn } from "../lib/style";
 import { useLocale, useTranslate } from "./store";
 
 const localeKey = {
@@ -12,7 +13,7 @@ function isLocale(value: string): value is Locale {
   return locales.some((locale) => locale === value);
 }
 
-export default function LanguageSwitch() {
+export default function LanguageSwitch({ className }: { className?: string }) {
   const locale = useLocale((state) => state.locale);
   const setLocale = useLocale((state) => state.setLocale);
   const translate = useTranslate();
@@ -28,7 +29,12 @@ export default function LanguageSwitch() {
         if (isLocale(value)) setLocale(value);
       }}
     >
-      <SelectTrigger className="absolute top-4 right-4 z-10 w-28">
+      <SelectTrigger
+        className={cn(
+          "h-11 rounded-full border-white/10 bg-white/10 px-4 text-white/90 backdrop-blur-md",
+          className,
+        )}
+      >
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

@@ -1,0 +1,149 @@
+{
+  "name": "스마트 골프 클럽",
+  "holes": [
+    {
+      "number": 10,
+      "name": { "ko": "혼조 다치카와", "jp": "本所立川" },
+      "par": 4,
+      "handicap": 8,
+      "dogleg": "right",
+      "elevation": 4,
+      "tees": [
+        { "name": "blue", "yards": 402, "meters": 368 },
+        { "name": "white", "yards": 357, "meters": 326 },
+        { "name": "red", "yards": 294, "meters": 269 }
+      ],
+      "green": { "depth": 32, "width": 26 },
+      "bunkers": 4,
+      "water": false
+    },
+    {
+      "number": 11,
+      "name": { "ko": "신슈 스와호", "jp": "信州諏訪湖" },
+      "par": 5,
+      "handicap": 10,
+      "dogleg": "left",
+      "elevation": -2,
+      "tees": [
+        { "name": "blue", "yards": 573, "meters": 524 },
+        { "name": "white", "yards": 518, "meters": 474 },
+        { "name": "red", "yards": 448, "meters": 410 }
+      ],
+      "green": { "depth": 36, "width": 28 },
+      "bunkers": 3,
+      "water": true
+    },
+    {
+      "number": 12,
+      "name": { "ko": "소슈 에노시마", "jp": "相州江の島" },
+      "par": 4,
+      "handicap": 16,
+      "dogleg": "straight",
+      "elevation": 8,
+      "tees": [
+        { "name": "blue", "yards": 381, "meters": 348 },
+        { "name": "white", "yards": 347, "meters": 317 },
+        { "name": "red", "yards": 305, "meters": 279 }
+      ],
+      "green": { "depth": 24, "width": 22 },
+      "bunkers": 2,
+      "water": true
+    },
+    {
+      "number": 13,
+      "name": { "ko": "동도 아사쿠사 혼간지", "jp": "東都浅草本願寺" },
+      "par": 3,
+      "handicap": 2,
+      "dogleg": "right",
+      "elevation": 6,
+      "tees": [
+        { "name": "blue", "yards": 250, "meters": 229 },
+        { "name": "white", "yards": 193, "meters": 176 },
+        { "name": "red", "yards": 165, "meters": 151 }
+      ],
+      "green": { "depth": 30, "width": 20 },
+      "bunkers": 5,
+      "water": false
+    },
+    {
+      "number": 14,
+      "name": { "ko": "도카이도 시나가와 고텐야마의 후지", "jp": "東海道品川御殿山の不二" },
+      "par": 4,
+      "handicap": 4,
+      "dogleg": "straight",
+      "elevation": 1,
+      "tees": [
+        { "name": "blue", "yards": 448, "meters": 410 },
+        { "name": "white", "yards": 411, "meters": 376 },
+        { "name": "red", "yards": 384, "meters": 351 }
+      ],
+      "green": { "depth": 28, "width": 24 },
+      "bunkers": 3,
+      "water": false
+    },
+    {
+      "number": 15,
+      "name": { "ko": "도카이도 가나야의 후지", "jp": "東海道金谷の不二" },
+      "par": 5,
+      "handicap": 12,
+      "dogleg": "left",
+      "elevation": 3,
+      "tees": [
+        { "name": "blue", "yards": 610, "meters": 558 },
+        { "name": "white", "yards": 549, "meters": 502 },
+        { "name": "red", "yards": 504, "meters": 461 }
+      ],
+      "green": { "depth": 38, "width": 30 },
+      "bunkers": 4,
+      "water": false
+    },
+    {
+      "number": 16,
+      "name": { "ko": "은거", "jp": "隠居" },
+      "par": 4,
+      "handicap": 6,
+      "dogleg": "straight",
+      "elevation": 12,
+      "tees": [
+        { "name": "blue", "yards": 426, "meters": 390 },
+        { "name": "white", "yards": 377, "meters": 345 },
+        { "name": "red", "yards": 322, "meters": 294 }
+      ],
+      "green": { "depth": 22, "width": 18 },
+      "bunkers": 3,
+      "water": false
+    },
+    {
+      "number": 17,
+      "name": { "ko": "가나가와 파도 뒤", "jp": "神奈川浪裏" },
+      "par": 3,
+      "handicap": 14,
+      "dogleg": "right",
+      "elevation": -3,
+      "tees": [
+        { "name": "blue", "yards": 161, "meters": 147 },
+        { "name": "white", "yards": 145, "meters": 133 },
+        { "name": "red", "yards": 105, "meters": 96 }
+      ],
+      "green": { "depth": 29, "width": 25 },
+      "bunkers": 2,
+      "water": true
+    },
+    {
+      "number": 18,
+      "name": { "ko": "노보리토 뒤", "jp": "登戸裏" },
+      "par": 4,
+      "handicap": 18,
+      "dogleg": "left",
+      "elevation": 2,
+      "tees": [
+        { "name": "blue", "yards": 361, "meters": 330 },
+        { "name": "white", "yards": 317, "meters": 290 },
+        { "name": "red", "yards": 288, "meters": 263 }
+      ],
+      "green": { "depth": 34, "width": 27 },
+      "bunkers": 4,
+      "water": false
+    }
+  ]
+}
