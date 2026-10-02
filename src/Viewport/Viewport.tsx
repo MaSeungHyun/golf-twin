@@ -1,4 +1,4 @@
-import { Bounds, Environment, OrbitControls } from "@react-three/drei";
+import { Environment, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
@@ -7,9 +7,6 @@ import {
   CAMERA_TARGET,
 } from "../constants/camera";
 import Scene from "./Scene";
-import Skybox from "./Skybox";
-import { Suspense } from "react";
-import Model from "./Model";
 
 function logCamera(event?: unknown) {
   const controls = (event as { target?: OrbitControlsImpl } | undefined)
@@ -49,12 +46,6 @@ export default function Viewport() {
           target={CAMERA_TARGET}
           onEnd={logCamera}
         />
-        {/* <Suspense fallback={null}>
-          <Skybox />
-          <Bounds clip margin={1.2}>
-            <Model />
-          </Bounds>
-        </Suspense> */}
       </Canvas>
     </div>
   );

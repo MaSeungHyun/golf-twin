@@ -15,5 +15,7 @@ export function setSkyOpacity(value: number) {
 export function bindSkyOpacity(apply: ApplySkyOpacity) {
   listeners.add(apply);
   apply(opacity);
-  return () => listeners.delete(apply);
+  return () => {
+    listeners.delete(apply);
+  };
 }
