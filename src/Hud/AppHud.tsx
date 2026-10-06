@@ -128,7 +128,9 @@ export default function AppHud() {
   const [courseOpen, setCourseOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [machineOpen, setMachineOpen] = useState(false);
-  const reportCount = useReports((state) => state.reports.length);
+  const reportCount = useReports(
+    (state) => state.reports.filter((report) => report.resolvedAt == null).length,
+  );
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20 text-white">

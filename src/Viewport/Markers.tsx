@@ -1,28 +1,16 @@
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
+import { TriangleAlert, Wrench } from "lucide-react";
 import { useRef, useState } from "react";
 import { useLocation } from "react-router";
 import type { Group, Mesh, MeshBasicMaterial } from "three";
 import { DoubleSide } from "three";
 import { useLocale, useTranslate } from "../i18n/store";
+import { cn } from "../lib/style";
 import { caddieSelf, caddies, liveProgress } from "../mock/caddie";
 import { useReports } from "../report/store";
 import { useCourseView } from "./courseView";
 import { holeSurfacePoint } from "./Hole";
-
-const pinColor = {
-  emergency: "#ff0000",
-  maintenance: "#f59e0b",
-} as const;
-
-function labelInk(hex: string) {
-  const value = Number.parseInt(hex.slice(1), 16);
-  const red = (value >> 16) & 255;
-  const green = (value >> 8) & 255;
-  const blue = value & 255;
-  const luminance = (red * 299 + green * 587 + blue * 114) / 255000;
-  return luminance > 0.6 ? "#111111" : "#ffffff";
-}
 
 function CaddieMarker({
   hole,
@@ -143,22 +131,23 @@ function CaddieMarker({
 function Pin({
   hole,
   progress,
-  color,
+  emergency,
   label,
   visible,
+  nudge = 0,
 }: {
   hole: number;
   progress: number;
-  color: string;
+  emergency: boolean;
   label: string;
   visible: boolean;
+  nudge?: number;
 }) {
   const group = useRef<Group>(null);
-  const ring = useRef<Mesh>(null);
-  const post = useRef<Mesh>(null);
-  const head = useRef<Mesh>(null);
-  const labelAnchor = useRef<Group>(null);
   const [shown, setShown] = useState(false);
+  const tone = emergency ? "bg-[#ff3b3b]" : "bg-[#f59e0b]";
+  const line = emergency ? "bg-[#ff3b3b]" : "bg-[#f59e0b]";
+  const ring = emergency ? "border-[#ff3b3b]" : "border-[#f59e0b]";
 
   useFrame(() => {
     const target = group.current;
@@ -166,52 +155,50 @@ function Pin({
     const next = Boolean(point) && visible;
 
     if (target) target.visible = next;
-    if (point && target && ring.current && post.current && head.current) {
-      const radius = point.radius;
-      target.position.copy(point.position);
-      ring.current.scale.setScalar(radius);
-      post.current.scale.set(radius * 0.08, radius * 2.4, radius * 0.08);
-      post.current.position.y = radius * 1.2;
-      head.current.scale.setScalar(radius * 0.28);
-      head.current.position.y = radius * 2.45;
-      if (labelAnchor.current) labelAnchor.current.position.y = radius * 3.1;
-    }
-
+    if (point && target) target.position.copy(point.position);
     setShown((current) => (current === next ? current : next));
   });
 
   return (
     <group ref={group} visible={false}>
-      <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} raycast={() => null}>
-        <ringGeometry args={[0.62, 1, 40]} />
-        <meshBasicMaterial
-          color={color}
-          side={DoubleSide}
-          transparent
-          opacity={0.9}
-          depthWrite={false}
-        />
-      </mesh>
-      <mesh ref={post} raycast={() => null}>
-        <cylinderGeometry args={[1, 1, 1, 10]} />
-        <meshBasicMaterial color={color} />
-      </mesh>
-      <mesh ref={head} raycast={() => null}>
-        <sphereGeometry args={[1, 18, 18]} />
-        <meshBasicMaterial color={color} />
-      </mesh>
-      <group ref={labelAnchor}>
-        {shown ? (
-          <Html center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+      {shown ? (
+        <Html zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+          <div
+            className="flex flex-col items-center"
+            style={{ transform: `translate(calc(-50% + ${nudge * 84}px), -100%)` }}
+          >
             <div
-              className="rounded-full px-2.5 py-1 text-sm whitespace-nowrap"
-              style={{ backgroundColor: color, color: labelInk(color) }}
+              className={cn(
+                "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-bold whitespace-nowrap text-white shadow-lg",
+                tone,
+              )}
             >
+              {emergency ? (
+                <TriangleAlert className="size-3.5" />
+              ) : (
+                <Wrench className="size-3.5" />
+              )}
               {label}
             </div>
-          </Html>
-        ) : null}
-      </group>
+            <div className={cn("h-10 w-0.5", line)} />
+            <div className="relative flex size-10 items-center justify-center">
+              <span
+                className={cn(
+                  "absolute size-10 rounded-full border-2 opacity-70",
+                  ring,
+                )}
+              />
+              <span
+                className={cn(
+                  "absolute size-6 animate-ping rounded-full border-2",
+                  ring,
+                )}
+              />
+              <span className={cn("size-2.5 rounded-full", tone)} />
+            </div>
+          </div>
+        </Html>
+      ) : null}
     </group>
   );
 }
@@ -246,26 +233,29 @@ export default function Markers() {
         />
       ))}
       {!game
-        ? reports.map((report, index) => {
-            const overlap = reports
-              .slice(0, index)
-              .filter((item) => item.hole === report.hole).length;
+        ? reports
+            .filter((report) => report.resolvedAt == null)
+            .map((report, index, open) => {
+              const overlap = open
+                .slice(0, index)
+                .filter((item) => item.hole === report.hole).length;
 
-            return (
-              <Pin
-                key={report.id}
-                hole={report.hole}
-                progress={Math.min(0.92, report.progress + overlap * 0.08)}
-                color={pinColor[report.kind]}
-                label={translate(
-                  report.kind === "emergency"
-                    ? "report.kind.emergency"
-                    : "report.kind.maintenance",
-                )}
-                visible={onHole(report.hole)}
-              />
-            );
-          })
+              return (
+                <Pin
+                  key={report.id}
+                  hole={report.hole}
+                  progress={Math.min(0.92, report.progress + overlap * 0.08)}
+                  emergency={report.kind === "emergency"}
+                  nudge={overlap}
+                  label={translate(
+                    report.kind === "emergency"
+                      ? "report.kind.emergency"
+                      : "report.kind.maintenance",
+                  )}
+                  visible={onHole(report.hole)}
+                />
+              );
+            })
         : null}
     </>
   );

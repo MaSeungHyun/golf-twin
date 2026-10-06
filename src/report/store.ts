@@ -21,6 +21,7 @@ type ReportDraft = Omit<Report, "id" | "createdAt" | "resolvedAt">;
 type ReportState = {
   reports: Report[];
   submit: (draft: ReportDraft) => void;
+  resolve: (id: string) => void;
 };
 
 export const useReports = create<ReportState>((set) => ({
@@ -36,5 +37,13 @@ export const useReports = create<ReportState>((set) => ({
         },
         ...state.reports,
       ],
+    })),
+  resolve: (id) =>
+    set((state) => ({
+      reports: state.reports.map((report) =>
+        report.id === id && report.resolvedAt == null
+          ? { ...report, resolvedAt: Date.now() }
+          : report,
+      ),
     })),
 }));
