@@ -75,7 +75,10 @@ export default function ReportDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent
+        onPointerDownOutside={(event) => event.preventDefault()}
+        onInteractOutside={(event) => event.preventDefault()}
+      >
         <DialogTitle>{translate("report.title")}</DialogTitle>
         <DialogDescription>
           {holeLabel(hole.number)} · {holeName(hole, locale)} ·{" "}
