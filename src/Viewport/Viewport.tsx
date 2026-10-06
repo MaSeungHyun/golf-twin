@@ -46,6 +46,7 @@ export default function Viewport() {
           makeDefault
           enableDamping={false}
           target={CAMERA_TARGET}
+          maxPolarAngle={Math.PI / 2.1}
           onEnd={logCamera}
         />
       </Canvas>
