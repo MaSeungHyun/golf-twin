@@ -8,15 +8,15 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
-import Button from "../components/Button";
-import Panel from "../components/Panel";
-import type { MessageKey } from "../i18n/messages";
-import { useLocale, useTranslate } from "../i18n/store";
-import { cn } from "../lib/style";
-import { useMachines } from "../machine/store";
-import { caddieSelf } from "../mock/caddie";
-import { showCourseHole } from "../Viewport/Hole";
-import { useReports, type Report, type ReportKind } from "../report/store";
+import Button from "../../../components/Button";
+import Panel from "../../../components/Panel";
+import type { MessageKey } from "../../../i18n/messages";
+import { useLocale, useTranslate } from "../../../i18n/store";
+import { cn } from "../../../lib/style";
+import { useMachines } from "../../../machine/store";
+import { caddieSelf } from "../../../mock/caddie";
+import { showCourseHole } from "../../../Viewport/Hole";
+import { useReports, type Report, type ReportKind } from "../../../report/store";
 
 const kindKey = {
   emergency: "report.kind.emergency",

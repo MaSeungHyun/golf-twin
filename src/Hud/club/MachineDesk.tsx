@@ -1,13 +1,13 @@
 import { X } from "lucide-react";
 import { useState } from "react";
-import Button from "../components/Button";
-import Panel from "../components/Panel";
-import type { MessageKey } from "../i18n/messages";
-import { useLocale, useTranslate } from "../i18n/store";
-import { cn } from "../lib/style";
-import { useMachines } from "../machine/store";
-import type { MachineStatus } from "../mock/machines";
-import { useReports, type Report } from "../report/store";
+import Button from "../../components/Button";
+import Panel from "../../components/Panel";
+import type { MessageKey } from "../../i18n/messages";
+import { useLocale, useTranslate } from "../../i18n/store";
+import { cn } from "../../lib/style";
+import { useMachines } from "../../machine/store";
+import type { MachineStatus } from "../../mock/machines";
+import { useReports, type Report } from "../../report/store";
 
 const statusKey = {
   idle: "machine.status.idle",

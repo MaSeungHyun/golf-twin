@@ -1,17 +1,17 @@
 import { Sun, Wind } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import Button from "../components/Button";
-import Panel from "../components/Panel";
-import type { MessageKey } from "../i18n/messages";
-import { useLocale, useTranslate } from "../i18n/store";
-import { cn } from "../lib/style";
+import Button from "../../../components/Button";
+import Panel from "../../../components/Panel";
+import type { MessageKey } from "../../../i18n/messages";
+import { useLocale, useTranslate } from "../../../i18n/store";
+import { cn } from "../../../lib/style";
 import {
   loadTodayWeather,
   windFlowRotation,
   type TodayWeather,
   type WeatherHour,
   type WindCardinal,
-} from "../weather/weatherApi";
+} from "../../../weather/weatherApi";
 
 const windKey = {
   NORTH: "hud.wind.NORTH",
@@ -32,7 +32,7 @@ const windKey = {
   NORTH_NORTHWEST: "hud.wind.NORTH_NORTHWEST",
 } as const satisfies Record<WindCardinal, MessageKey>;
 
-export default function WeatherMenu() {
+export default function Weather() {
   const translate = useTranslate();
   const locale = useLocale((state) => state.locale);
   const [open, setOpen] = useState(false);

@@ -1,18 +1,18 @@
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
-import Button from "../components/Button";
+import Button from "../../../components/Button";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "../components/Dialog";
-import type { MessageKey } from "../i18n/messages";
-import { useLocale, useTranslate } from "../i18n/store";
-import { cn } from "../lib/style";
-import { caddieSelf } from "../mock/caddie";
-import { useReports, type ReportKind, type Severity } from "../report/store";
+} from "../../../components/Dialog";
+import type { MessageKey } from "../../../i18n/messages";
+import { useLocale, useTranslate } from "../../../i18n/store";
+import { cn } from "../../../lib/style";
+import { caddieSelf } from "../../../mock/caddie";
+import { useReports, type ReportKind, type Severity } from "../../../report/store";
 
 const kindKey = {
   emergency: "report.kind.emergency",
