@@ -216,13 +216,13 @@ export default function CourseStatus({
                     <span
                       className={cn(
                         "inline-flex items-center gap-1.5 text-sm font-semibold",
-                        waiting ? "text-amber-400" : "text-accent",
+                        waiting ? "text-maintenance" : "text-accent",
                       )}
                     >
                       <span
                         className={cn(
                           "size-1.5 rounded-full",
-                          waiting ? "bg-amber-400" : "bg-accent",
+                          waiting ? "bg-maintenance" : "bg-accent",
                         )}
                       />
                       {translate(waiting ? "course.waiting" : "course.playing")}

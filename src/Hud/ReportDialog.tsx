@@ -109,8 +109,8 @@ export default function ReportDialog({
                   "h-12",
                   kind === value &&
                     (value === "emergency"
-                      ? "border-red-400/70 bg-red-500/15 text-red-100 hover:bg-red-500/20"
-                      : "border-amber-300/70 bg-amber-400/15 text-amber-100 hover:bg-amber-400/20"),
+                      ? "border-emergency/70 bg-emergency/15 text-emergency hover:bg-emergency/20"
+                      : "border-maintenance/70 bg-maintenance/15 text-maintenance hover:bg-maintenance/20"),
                 )}
                 aria-pressed={kind === value}
                 onClick={() => setKind(value)}

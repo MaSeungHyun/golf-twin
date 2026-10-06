@@ -137,16 +137,16 @@ export default function MachineDesk({ onClose }: { onClose: () => void }) {
                           className={cn(
                             "inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold",
                             machine.status === "working" && "text-accent",
-                            machine.status === "idle" && "text-amber-400",
-                            broken && "text-[#ff0000]",
+                            machine.status === "idle" && "text-maintenance",
+                            broken && "text-emergency",
                           )}
                         >
                           <span
                             className={cn(
                               "size-1.5 rounded-full",
                               machine.status === "working" && "bg-accent",
-                              machine.status === "idle" && "bg-amber-400",
-                              broken && "bg-[#ff0000]",
+                              machine.status === "idle" && "bg-maintenance",
+                              broken && "bg-emergency",
                             )}
                           />
                           {translate(statusKey[machine.status])}

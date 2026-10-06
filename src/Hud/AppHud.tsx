@@ -349,8 +349,8 @@ export default function AppHud() {
             </p>
           </div>
           {inUseByOther && otherGroup ? (
-            <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-amber-500">
-              <span className="size-1.5 rounded-full bg-amber-500" />
+            <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-maintenance">
+              <span className="size-1.5 rounded-full bg-maintenance" />
               {otherGroup[locale]} · {translate("hole.inUse")}
             </p>
           ) : null}

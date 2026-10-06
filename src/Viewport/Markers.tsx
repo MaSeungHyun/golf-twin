@@ -12,6 +12,10 @@ import { useReports } from "../report/store";
 import { useCourseView } from "./courseView";
 import { holeSurfacePoint } from "./Hole";
 
+function themeColor(token: string) {
+  return getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+}
+
 function CaddieMarker({
   hole,
   baseProgress,
@@ -149,8 +153,8 @@ function Pin({
   const dot = useRef<Mesh>(null);
   const labelAnchor = useRef<Group>(null);
   const [shown, setShown] = useState(false);
-  const color = emergency ? "#ff3b3b" : "#f59e0b";
-  const tone = emergency ? "bg-[#ff3b3b]" : "bg-[#f59e0b]";
+  const color = themeColor(emergency ? "--color-emergency" : "--color-maintenance");
+  const tone = emergency ? "bg-emergency" : "bg-maintenance";
 
   useFrame(({ camera, clock }) => {
     const target = group.current;

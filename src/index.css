@@ -8,6 +8,20 @@
   --color-accent: #5dffb1;
   --color-accent-strong: #3ddc97;
   --color-accent-surface: #143528;
+  --color-emergency: #ff3b3b;
+  --color-emergency-strong: #5a1820;
+  --color-emergency-deep: #2a1218;
+  --color-emergency-card: #4a1520;
+  --color-maintenance: #f59e0b;
+  --color-maintenance-strong: #4a3410;
+  --color-maintenance-deep: #241c0e;
+  --color-maintenance-card: #3d2c10;
+  --color-board: #121816;
+  --color-board-raised: #1c2836;
+  --color-chip: #24302c;
+  --color-action: #3dffc3;
+  --color-action-ink: #06281c;
+  --color-control: #2a2a2a;
 }
 
 @layer components {

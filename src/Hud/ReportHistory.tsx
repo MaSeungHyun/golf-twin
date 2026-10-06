@@ -119,22 +119,22 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
         <Summary
           label={translate("report.summary.all")}
           count={open.length}
-          className="border-white/10 bg-[#1c2836]"
+          className="border-white/10 bg-board-raised"
           icon={<List className="size-5 text-white/80" />}
         />
         <Summary
           label={translate("report.summary.emergency")}
           count={emergencyCount}
-          className="border-[#ff4d4d]/40 bg-[linear-gradient(to_bottom_right,#5a1820_0%,#2a1218_25%,#2a1218_100%)]"
-          valueClass="text-[#ff4d4d]"
-          icon={<TriangleAlert className="size-5 text-[#ff4d4d]" />}
+          className="border-emergency/40 bg-[linear-gradient(to_bottom_right,var(--color-emergency-strong)_0%,var(--color-emergency-deep)_25%,var(--color-emergency-deep)_100%)]"
+          valueClass="text-emergency"
+          icon={<TriangleAlert className="size-5 text-emergency" />}
         />
         <Summary
           label={translate("report.summary.maintenance")}
           count={maintenanceCount}
-          className="border-amber-400/40 bg-[linear-gradient(to_bottom_right,#4a3410_0%,#241c0e_25%,#241c0e_100%)]"
-          valueClass="text-amber-400"
-          icon={<Wrench className="size-5 text-amber-400" />}
+          className="border-maintenance/40 bg-[linear-gradient(to_bottom_right,var(--color-maintenance-strong)_0%,var(--color-maintenance-deep)_25%,var(--color-maintenance-deep)_100%)]"
+          valueClass="text-maintenance"
+          icon={<Wrench className="size-5 text-maintenance" />}
         />
       </div>
 
@@ -148,13 +148,13 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
           active={filter === "emergency"}
           onClick={() => setFilter("emergency")}
           label={`${translate("report.summary.emergency")} (${emergencyCount})`}
-          dot="bg-[#ff3b3b]"
+          dot="bg-emergency"
         />
         <FilterChip
           active={filter === "maintenance"}
           onClick={() => setFilter("maintenance")}
           label={`${translate("report.summary.maintenance")} (${maintenanceCount})`}
-          dot="bg-amber-400"
+          dot="bg-maintenance"
         />
         <FilterChip
           active={filter === "done"}
@@ -182,15 +182,15 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
                   className={cn(
                     "rounded-xl border px-2.5 py-2",
                     emergency
-                      ? "border-[#ff4d4d]/55 bg-[linear-gradient(to_bottom_right,#4a1520_0%,#121816_55%,#121816_100%)]"
-                      : "border-amber-400/55 bg-[linear-gradient(to_bottom_right,#3d2c10_0%,#121816_35%,#121816_100%)]",
+                      ? "border-emergency/55 bg-[linear-gradient(to_bottom_right,var(--color-emergency-card)_0%,var(--color-board)_55%,var(--color-board)_100%)]"
+                      : "border-maintenance/55 bg-[linear-gradient(to_bottom_right,var(--color-maintenance-card)_0%,var(--color-board)_35%,var(--color-board)_100%)]",
                   )}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <p
                       className={cn(
                         "inline-flex items-center gap-1 text-sm font-bold",
-                        emergency ? "text-[#ff5a5a]" : "text-amber-400",
+                        emergency ? "text-emergency" : "text-maintenance",
                       )}
                     >
                       {emergency ? (
@@ -219,13 +219,13 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
                       <span
                         className={cn(
                           "inline-flex items-center gap-1 text-xs font-semibold",
-                          done ? "text-white/55" : "text-amber-400",
+                          done ? "text-white/55" : "text-maintenance",
                         )}
                       >
                         <span
                           className={cn(
                             "size-1.5 rounded-full",
-                            done ? "bg-white/40" : "bg-amber-400",
+                            done ? "bg-white/40" : "bg-maintenance",
                           )}
                         />
                         {translate(
@@ -241,7 +241,7 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
                       <button
                         type="button"
                         onClick={() => showCourseHole(report.hole)}
-                        className="inline-flex h-7 items-center gap-1 rounded-full border border-white/10 bg-[#2a2a2a] px-2.5 text-xs text-white"
+                        className="inline-flex h-7 items-center gap-1 rounded-full border border-white/10 bg-control px-2.5 text-xs text-white"
                       >
                         <MapPin className="size-3.5" />
                         {translate("caddie.show")}
@@ -250,7 +250,7 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
                         <button
                           type="button"
                           onClick={() => finish(report)}
-                          className="inline-flex h-7 items-center gap-1 rounded-full bg-[#3dffc3] px-2.5 text-xs font-bold text-[#06281c]"
+                          className="inline-flex h-7 items-center gap-1 rounded-full bg-action px-2.5 text-xs font-bold text-action-ink"
                         >
                           <Check className="size-3.5" />
                           {translate("report.resolve")}
@@ -312,7 +312,7 @@ function FilterChip({
       onClick={onClick}
       className={cn(
         "inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-sm font-semibold",
-        active ? "bg-[#3dffc3] text-[#06281c]" : "bg-[#24302c] text-white/80",
+        active ? "bg-action text-action-ink" : "bg-chip text-white/80",
       )}
     >
       {dot ? <span className={cn("size-1.5 rounded-full", dot)} /> : null}
