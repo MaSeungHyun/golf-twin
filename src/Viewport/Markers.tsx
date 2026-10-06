@@ -11,9 +11,18 @@ import { useCourseView } from "./courseView";
 import { holeSurfacePoint } from "./Hole";
 
 const pinColor = {
-  emergency: "#ff5d6c",
-  maintenance: "#ffb020",
+  emergency: "#ff0000",
+  maintenance: "#f59e0b",
 } as const;
+
+function labelInk(hex: string) {
+  const value = Number.parseInt(hex.slice(1), 16);
+  const red = (value >> 16) & 255;
+  const green = (value >> 8) & 255;
+  const blue = value & 255;
+  const luminance = (red * 299 + green * 587 + blue * 114) / 255000;
+  return luminance > 0.6 ? "#111111" : "#ffffff";
+}
 
 function CaddieMarker({
   hole,
@@ -194,7 +203,10 @@ function Pin({
       <group ref={labelAnchor}>
         {shown ? (
           <Html center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
-            <div className="rounded-full border border-white/20 bg-black/75 px-2.5 py-1 text-sm whitespace-nowrap text-white">
+            <div
+              className="rounded-full px-2.5 py-1 text-sm whitespace-nowrap"
+              style={{ backgroundColor: color, color: labelInk(color) }}
+            >
               {label}
             </div>
           </Html>
@@ -235,25 +247,25 @@ export default function Markers() {
       ))}
       {!game
         ? reports.map((report, index) => {
-          const overlap = reports
-            .slice(0, index)
-            .filter((item) => item.hole === report.hole).length;
+            const overlap = reports
+              .slice(0, index)
+              .filter((item) => item.hole === report.hole).length;
 
-          return (
-            <Pin
-              key={report.id}
-              hole={report.hole}
-              progress={Math.min(0.92, report.progress + overlap * 0.08)}
-              color={pinColor[report.kind]}
-              label={translate(
-                report.kind === "emergency"
-                  ? "report.kind.emergency"
-                  : "report.kind.maintenance",
-              )}
-              visible={onHole(report.hole)}
-            />
-          );
-        })
+            return (
+              <Pin
+                key={report.id}
+                hole={report.hole}
+                progress={Math.min(0.92, report.progress + overlap * 0.08)}
+                color={pinColor[report.kind]}
+                label={translate(
+                  report.kind === "emergency"
+                    ? "report.kind.emergency"
+                    : "report.kind.maintenance",
+                )}
+                visible={onHole(report.hole)}
+              />
+            );
+          })
         : null}
     </>
   );
