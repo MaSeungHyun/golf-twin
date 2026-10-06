@@ -134,71 +134,112 @@ function Pin({
   emergency,
   label,
   visible,
-  nudge = 0,
 }: {
   hole: number;
   progress: number;
   emergency: boolean;
   label: string;
   visible: boolean;
-  nudge?: number;
 }) {
   const group = useRef<Group>(null);
+  const ring = useRef<Mesh>(null);
+  const pulse = useRef<Mesh>(null);
+  const pulseMat = useRef<MeshBasicMaterial>(null);
+  const post = useRef<Mesh>(null);
+  const dot = useRef<Mesh>(null);
+  const labelAnchor = useRef<Group>(null);
   const [shown, setShown] = useState(false);
+  const color = emergency ? "#ff3b3b" : "#f59e0b";
   const tone = emergency ? "bg-[#ff3b3b]" : "bg-[#f59e0b]";
-  const line = emergency ? "bg-[#ff3b3b]" : "bg-[#f59e0b]";
-  const ring = emergency ? "border-[#ff3b3b]" : "border-[#f59e0b]";
 
-  useFrame(() => {
+  useFrame(({ camera, clock }) => {
     const target = group.current;
     const point = holeSurfacePoint(hole, progress);
     const next = Boolean(point) && visible;
 
     if (target) target.visible = next;
-    if (point && target) target.position.copy(point.position);
+    if (
+      point &&
+      target &&
+      ring.current &&
+      pulse.current &&
+      post.current &&
+      dot.current &&
+      labelAnchor.current
+    ) {
+      target.position.copy(point.position);
+      const distance = camera.position.distanceTo(point.position);
+      const radius = Math.min(Math.max(distance * 0.012, 2.2), 9);
+      ring.current.scale.setScalar(radius);
+      const wave = (clock.elapsedTime % 1.6) / 1.6;
+      pulse.current.scale.setScalar(radius * (1 + wave * 0.85));
+      if (pulseMat.current) pulseMat.current.opacity = 0.55 * (1 - wave);
+      post.current.scale.set(radius * 0.04, radius * 2.4, radius * 0.04);
+      post.current.position.y = radius * 1.2;
+      dot.current.scale.setScalar(radius);
+      labelAnchor.current.position.y = radius * 2.45;
+    }
+
     setShown((current) => (current === next ? current : next));
   });
 
   return (
     <group ref={group} visible={false}>
-      {shown ? (
-        <Html zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
-          <div
-            className="flex flex-col items-center"
-            style={{ transform: `translate(calc(-50% + ${nudge * 84}px), -100%)` }}
-          >
-            <div
-              className={cn(
-                "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-bold whitespace-nowrap text-white shadow-lg",
-                tone,
-              )}
-            >
-              {emergency ? (
-                <TriangleAlert className="size-3.5" />
-              ) : (
-                <Wrench className="size-3.5" />
-              )}
-              {label}
-            </div>
-            <div className={cn("h-10 w-0.5", line)} />
-            <div className="relative flex size-10 items-center justify-center">
-              <span
+      <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} raycast={() => null}>
+        <ringGeometry args={[0.62, 1, 48]} />
+        <meshBasicMaterial
+          color={color}
+          side={DoubleSide}
+          transparent
+          opacity={0.95}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh ref={pulse} rotation={[-Math.PI / 2, 0, 0]} raycast={() => null}>
+        <ringGeometry args={[0.92, 1.02, 48]} />
+        <meshBasicMaterial
+          ref={pulseMat}
+          color={color}
+          side={DoubleSide}
+          transparent
+          opacity={0.45}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh ref={dot} rotation={[-Math.PI / 2, 0, 0]} raycast={() => null}>
+        <circleGeometry args={[0.22, 24]} />
+        <meshBasicMaterial
+          color={color}
+          side={DoubleSide}
+          transparent
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh ref={post} raycast={() => null}>
+        <cylinderGeometry args={[1, 1, 1, 8]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+      <group ref={labelAnchor}>
+        {shown ? (
+          <Html zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+            <div className="flex -translate-x-1/2 -translate-y-full flex-col items-center pb-1">
+              <div
                 className={cn(
-                  "absolute size-10 rounded-full border-2 opacity-70",
-                  ring,
+                  "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-bold whitespace-nowrap text-white shadow-lg",
+                  tone,
                 )}
-              />
-              <span
-                className={cn(
-                  "absolute size-6 animate-ping rounded-full border-2",
-                  ring,
+              >
+                {emergency ? (
+                  <TriangleAlert className="size-3.5" />
+                ) : (
+                  <Wrench className="size-3.5" />
                 )}
-              />
-              <span className={cn("size-2.5 rounded-full", tone)} />
+                {label}
+              </div>
             </div>
-          </div>
-        </Html>
-      ) : null}
+          </Html>
+        ) : null}
+      </group>
     </group>
   );
 }
@@ -246,7 +287,6 @@ export default function Markers() {
                   hole={report.hole}
                   progress={Math.min(0.92, report.progress + overlap * 0.08)}
                   emergency={report.kind === "emergency"}
-                  nudge={overlap}
                   label={translate(
                     report.kind === "emergency"
                       ? "report.kind.emergency"

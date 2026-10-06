@@ -1,4 +1,12 @@
-import { Check, List, MapPin, TriangleAlert, User, Wrench, X } from "lucide-react";
+import {
+  Check,
+  List,
+  MapPin,
+  TriangleAlert,
+  User,
+  Wrench,
+  X,
+} from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import Button from "../components/Button";
 import Panel from "../components/Panel";
@@ -60,8 +68,12 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
     ),
   );
   const open = reports.filter((report) => report.resolvedAt == null);
-  const emergencyCount = open.filter((report) => report.kind === "emergency").length;
-  const maintenanceCount = open.filter((report) => report.kind === "maintenance").length;
+  const emergencyCount = open.filter(
+    (report) => report.kind === "emergency",
+  ).length;
+  const maintenanceCount = open.filter(
+    (report) => report.kind === "maintenance",
+  ).length;
   const doneCount = reports.length - open.length;
   const visible = reports.filter((report) => {
     if (filter === "done") return report.resolvedAt != null;
@@ -80,7 +92,9 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
       <div className="flex items-start justify-between gap-3 py-3 pr-1.5 pl-4">
         <div>
           <p className="text-lg font-bold">{translate("report.board.title")}</p>
-          <p className="text-sm text-white/55">{translate("report.board.subtitle")}</p>
+          <p className="text-sm text-white/55">
+            {translate("report.board.subtitle")}
+          </p>
         </div>
         <div className="flex items-start gap-2">
           <div className="pt-0.5 text-right">
@@ -111,14 +125,14 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
         <Summary
           label={translate("report.summary.emergency")}
           count={emergencyCount}
-          className="border-[#ff4d4d]/40 bg-gradient-to-br from-[#5a1820] to-[#2a1218]"
+          className="border-[#ff4d4d]/40 bg-[linear-gradient(to_bottom_right,#5a1820_0%,#2a1218_25%,#2a1218_100%)]"
           valueClass="text-[#ff4d4d]"
           icon={<TriangleAlert className="size-5 text-[#ff4d4d]" />}
         />
         <Summary
           label={translate("report.summary.maintenance")}
           count={maintenanceCount}
-          className="border-amber-400/40 bg-gradient-to-br from-[#4a3410] to-[#241c0e]"
+          className="border-amber-400/40 bg-[linear-gradient(to_bottom_right,#4a3410_0%,#241c0e_25%,#241c0e_100%)]"
           valueClass="text-amber-400"
           icon={<Wrench className="size-5 text-amber-400" />}
         />
@@ -151,10 +165,12 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
       </div>
 
       {visible.length === 0 ? (
-        <p className="px-4 py-4 text-sm text-white/60">{translate("report.empty")}</p>
+        <p className="px-4 py-4 text-sm text-white/60">
+          {translate("report.empty")}
+        </p>
       ) : (
         <div className="scroll-thumb mt-3 min-h-0 flex-1 overflow-y-auto">
-          <ul className="flex flex-col gap-2 px-4 pb-4">
+          <ul className="flex flex-col gap-1.5 px-4 pb-3">
             {visible.map((report) => {
               const emergency = report.kind === "emergency";
               const handling = taken.has(report.id);
@@ -164,43 +180,45 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
                 <li
                   key={report.id}
                   className={cn(
-                    "rounded-2xl border px-3.5 py-3",
+                    "rounded-xl border px-2.5 py-2",
                     emergency
-                      ? "border-[#ff4d4d]/55 bg-gradient-to-br from-[#4a1520]/90 via-[#241418] to-[#121816]"
-                      : "border-amber-400/55 bg-gradient-to-br from-[#3d2c10]/90 via-[#221c12] to-[#121816]",
+                      ? "border-[#ff4d4d]/55 bg-[linear-gradient(to_bottom_right,#4a1520_0%,#121816_55%,#121816_100%)]"
+                      : "border-amber-400/55 bg-[linear-gradient(to_bottom_right,#3d2c10_0%,#121816_35%,#121816_100%)]",
                   )}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start justify-between gap-2">
                     <p
                       className={cn(
-                        "inline-flex items-center gap-1.5 text-md font-bold",
+                        "inline-flex items-center gap-1 text-sm font-bold",
                         emergency ? "text-[#ff5a5a]" : "text-amber-400",
                       )}
                     >
                       {emergency ? (
-                        <TriangleAlert className="size-4" />
+                        <TriangleAlert className="size-3.5" />
                       ) : (
-                        <Wrench className="size-4" />
+                        <Wrench className="size-3.5" />
                       )}
                       {translate(kindKey[report.kind])}
                     </p>
-                    <span className="text-sm text-white/45">
+                    <span className="text-xs text-white/45">
                       {agoLabel(report.createdAt, now, locale)}
                     </span>
                   </div>
-                  <p className="mt-2.5 text-xl font-bold tracking-tight">{holeLabel(report.hole)}</p>
-                  <p className="mt-0.5 text-sm text-white/75">
+                  <p className="mt-1 text-base font-bold tracking-tight">
+                    {holeLabel(report.hole)}
+                  </p>
+                  <p className="text-xs text-white/75">
                     {report.note || translate(kindKey[report.kind])}
                   </p>
-                  <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-white/70">
-                    <User className="size-3.5" />
+                  <p className="mt-1 inline-flex items-center gap-1 text-xs text-white/70">
+                    <User className="size-3" />
                     {caddieSelf.name[locale]} · {caddieSelf.group[locale]}
                   </p>
-                  <div className="mt-3 flex items-center justify-between gap-2">
+                  <div className="mt-1.5 flex items-center justify-between gap-2">
                     {done || handling ? (
                       <span
                         className={cn(
-                          "inline-flex items-center gap-1.5 text-sm font-semibold",
+                          "inline-flex items-center gap-1 text-xs font-semibold",
                           done ? "text-white/55" : "text-amber-400",
                         )}
                       >
@@ -210,7 +228,11 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
                             done ? "bg-white/40" : "bg-amber-400",
                           )}
                         />
-                        {translate(done ? "report.filter.done" : "report.status.handling")}
+                        {translate(
+                          done
+                            ? "report.filter.done"
+                            : "report.status.handling",
+                        )}
                       </span>
                     ) : (
                       <span />
@@ -219,7 +241,7 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
                       <button
                         type="button"
                         onClick={() => showCourseHole(report.hole)}
-                        className="inline-flex h-9 items-center gap-1 rounded-full border border-white/10 bg-[#2a2a2a] px-3 text-sm text-white"
+                        className="inline-flex h-7 items-center gap-1 rounded-full border border-white/10 bg-[#2a2a2a] px-2.5 text-xs text-white"
                       >
                         <MapPin className="size-3.5" />
                         {translate("caddie.show")}
@@ -228,7 +250,7 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
                         <button
                           type="button"
                           onClick={() => finish(report)}
-                          className="inline-flex h-9 items-center gap-1 rounded-full bg-[#3dffc3] px-3 text-sm font-bold text-[#06281c]"
+                          className="inline-flex h-7 items-center gap-1 rounded-full bg-[#3dffc3] px-2.5 text-xs font-bold text-[#06281c]"
                         >
                           <Check className="size-3.5" />
                           {translate("report.resolve")}
@@ -263,7 +285,9 @@ function Summary({
     <div className={cn("rounded-xl border px-3 py-2.5", className)}>
       <p className="text-sm text-white/70">{label}</p>
       <div className="mt-2 flex items-end justify-between">
-        <p className={cn("text-3xl leading-none font-bold", valueClass)}>{count}</p>
+        <p className={cn("text-3xl leading-none font-bold", valueClass)}>
+          {count}
+        </p>
         {icon}
       </div>
     </div>
