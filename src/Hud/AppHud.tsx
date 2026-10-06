@@ -254,13 +254,13 @@ export default function AppHud() {
 
       {single ? (
         <div
-          className="pointer-events-none absolute left-1/2 w-96 -translate-x-1/2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-md"
+          className="pointer-events-none absolute left-1/2 w-96 lg:w-104 -translate-x-1/2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-md"
           style={{ bottom }}
         >
           {/* <p className="text-md tracking-wide text-accent font-bold">
             {translate("hud.currentHole")}
           </p> */}
-          <div className="flex items-baseline justify-between gap-4 font-bold">
+          <div className="flex items-center justify-between gap-4 font-bold">
             <p className="inline-flex items-center gap-2 text-md">
               <Flag className="size-5 text-accent" />
               {holeLabel(current.number)}
@@ -269,13 +269,13 @@ export default function AppHud() {
               {holeName(current, locale)}
             </p>
           </div>
-          <div className="mt-2">
-            <div className="flex items-center justify-between text-sm text-white/70">
+          <div className="mt-4">
+            <TeeIndicators hole={current} />
+            <div className="mt-2 flex items-center gap-6 text-sm text-white/70">
               <span>PAR {current.par}</span>
               <span>HDCP {current.handicap}</span>
             </div>
-            <TeeIndicators hole={current} />
-            <p className="mt-2 text-sm leading-snug text-white/50">
+            <p className="mt-5 text-sm leading-snug text-white/50">
               {holeStatus(current, translate)}
             </p>
           </div>
