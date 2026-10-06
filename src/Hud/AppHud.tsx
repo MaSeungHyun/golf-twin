@@ -35,6 +35,7 @@ import Button from "../components/Button";
 import Indicator from "../components/Indicator";
 import { caddieSelf } from "../mock/caddie";
 import { useReports } from "../report/store";
+import CourseStatus from "./CourseStatus";
 import ReportDialog from "./ReportDialog";
 import ReportHistory from "./ReportHistory";
 import ScoreSheet from "./ScoreSheet";
@@ -116,12 +117,15 @@ export default function AppHud() {
   const bottom = `calc(1.25rem + env(safe-area-inset-bottom, 0px) + ${keyboardInset}px)`;
   const [reportOpen, setReportOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
   const [scoreOpen, setScoreOpen] = useState(false);
   const reportCount = useReports((state) => state.reports.length);
 
   useEffect(() => {
-    if (game) setHistoryOpen(false);
-    else {
+    if (game) {
+      setHistoryOpen(false);
+      setStatusOpen(false);
+    } else {
       setReportOpen(false);
       setScoreOpen(false);
     }
@@ -269,7 +273,12 @@ export default function AppHud() {
             <Button
               size="rail"
               variant="outline"
+              active={statusOpen}
               icon={<Activity className="size-6" />}
+              onClick={() => {
+                setStatusOpen(true);
+                setHistoryOpen(false);
+              }}
             >
               {translate("hud.courseStatus")}
             </Button>
@@ -279,7 +288,10 @@ export default function AppHud() {
               active={historyOpen}
               className="relative"
               icon={<Inbox className="size-6" />}
-              onClick={() => setHistoryOpen((open) => !open)}
+              onClick={() => {
+                setHistoryOpen((open) => !open);
+                setStatusOpen(false);
+              }}
             >
               {translate("hud.reportHistory")}
               {reportCount > 0 ? (
@@ -328,6 +340,10 @@ export default function AppHud() {
 
       {game && scoreOpen ? (
         <ScoreSheet onClose={() => setScoreOpen(false)} />
+      ) : null}
+
+      {!game ? (
+        <CourseStatus open={statusOpen} onOpenChange={setStatusOpen} />
       ) : null}
 
       {!game && historyOpen ? (
