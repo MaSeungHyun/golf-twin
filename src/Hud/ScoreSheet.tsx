@@ -40,8 +40,8 @@ export default function ScoreSheet({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Panel className="pointer-events-auto absolute top-1/2 right-40 z-20 flex max-h-[min(34rem,calc(100dvh-8rem))] w-80 -translate-y-1/2 flex-col px-4 pt-1 pb-3">
-      <div className="flex items-center justify-between gap-3">
+    <Panel className="pointer-events-auto absolute top-1/2 right-40 z-20 flex max-h-[min(34rem,calc(100dvh-8rem))] w-80 -translate-y-1/2 flex-col overflow-hidden">
+      <div className="flex items-center justify-between gap-3 py-1.5 pr-1.5 pl-4">
         <p className="text-md font-bold">{translate("hud.scoreManage")}</p>
         <Button
           size="sm"
@@ -52,10 +52,11 @@ export default function ScoreSheet({ onClose }: { onClose: () => void }) {
           onClick={onClose}
         />
       </div>
-      <p className="mt-1 text-sm text-white/70">
+      <p className="px-4 text-sm text-white/70">
         {holeLabel(hole.number)} · PAR {hole.par} · {caddieSelf.group[locale]}
       </p>
-      <ul className="scroll-thumb mt-3 flex flex-col gap-2 overflow-y-auto pr-1">
+      <div className="scroll-thumb mt-3 min-h-0 flex-1 overflow-y-auto">
+      <ul className="flex flex-col gap-2 px-4 pb-3">
         {groupPlayers.map((player) => {
           const value = readStrokes(strokes, player.id, hole.number);
           const result = value == null ? null : resultKey(value, hole.par);
@@ -114,6 +115,7 @@ export default function ScoreSheet({ onClose }: { onClose: () => void }) {
           );
         })}
       </ul>
+      </div>
     </Panel>
   );
 }

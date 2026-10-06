@@ -193,10 +193,10 @@ export default function CourseStatus({
                     );
                   })}
                   <td
-                      className={cn(
-                        cell,
-                        frame,
-                        "px-3 py-2.5 text-center font-semibold tabular-nums",
+                    className={cn(
+                      cell,
+                      frame,
+                      "px-3 py-2.5 text-center font-semibold tabular-nums",
                       total == null
                         ? "text-white/35"
                         : total < 0
@@ -206,7 +206,13 @@ export default function CourseStatus({
                   >
                     {total == null ? "—" : formatTotal(total)}
                   </td>
-                    <td className={cn(cell, frame, "border-r px-3 py-2.5 text-center")}>
+                  <td
+                    className={cn(
+                      cell,
+                      frame,
+                      "border-r px-3 py-2.5 text-center",
+                    )}
+                  >
                     <span
                       className={cn(
                         "inline-flex items-center gap-1.5 text-sm font-semibold",
@@ -233,12 +239,14 @@ export default function CourseStatus({
 
   if (dock) {
     return (
-      <Panel className="pointer-events-auto w-[min(72rem,calc(100vw-18rem))] px-3 pt-2 pb-3">
-        <div className="flex items-center justify-between gap-3">
+      <Panel className="pointer-events-auto w-[min(72rem,calc(100vw-18rem))] overflow-hidden">
+        <div className="flex items-center justify-between gap-3 py-2 pr-2 pl-3">
           <p className="text-md font-bold">{title}</p>
           {closeButton}
         </div>
-        <div className="scroll-thumb mt-2 overflow-x-auto">{table}</div>
+        <div className="scroll-thumb overflow-x-auto">
+          <div className="px-3 pb-3">{table}</div>
+        </div>
       </Panel>
     );
   }
@@ -248,14 +256,14 @@ export default function CourseStatus({
       <DialogContent
         aria-describedby={undefined}
         overlayClassName="bg-black/25"
-        className="flex h-[calc(100dvh-2.5rem)] w-[calc(100vw-2.5rem)] max-w-none flex-col overflow-hidden border-white/15 bg-neutral-800/50 p-5 shadow-lg backdrop-blur-xl"
+        className="flex h-[calc(100dvh-2.5rem)] w-[calc(100vw-2.5rem)] max-w-none flex-col overflow-hidden border-white/15 bg-neutral-800/50 p-0 shadow-lg backdrop-blur-xl"
       >
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 py-3 pr-2 pl-5">
           <DialogTitle className="text-xl font-bold">{title}</DialogTitle>
           <DialogClose asChild>{closeButton}</DialogClose>
         </div>
-        <div className="scroll-thumb mt-4 min-h-0 flex-1 overflow-auto">
-          {table}
+        <div className="scroll-thumb min-h-0 flex-1 overflow-auto">
+          <div className="px-5 pb-5">{table}</div>
         </div>
       </DialogContent>
     </Dialog>

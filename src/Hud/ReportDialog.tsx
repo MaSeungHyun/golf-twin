@@ -70,11 +70,11 @@ export default function ReportDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="px-5 pt-4 pb-5"
+        className="p-0"
         onPointerDownOutside={(event) => event.preventDefault()}
         onInteractOutside={(event) => event.preventDefault()}
       >
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 pt-3 pr-2 pl-5">
           <DialogTitle className="font-bold">
             {translate("report.title")}
           </DialogTitle>
@@ -88,12 +88,12 @@ export default function ReportDialog({
             />
           </DialogClose>
         </div>
-        <DialogDescription className="mt-1">
+        <DialogDescription className="mt-1 px-5">
           {holeLabel(caddieSelf.hole)} · {caddieSelf.name[locale]}
         </DialogDescription>
 
         <form
-          className="mt-5"
+          className="mt-5 px-5 pb-5"
           onSubmit={(event) => {
             event.preventDefault();
             send();
