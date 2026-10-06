@@ -122,10 +122,19 @@ export default function WeatherMenu() {
         </Button>
         {open ? (
           <Panel className="absolute top-full right-0 z-30 mt-2 flex max-h-96 w-96 flex-col p-2">
-            <p className="shrink-0 px-2 py-1.5 text-md font-bold tracking-wide text-accent">
-              {translate("hud.weather.today")} ·{" "}
-              {translate("hud.weather.place")}
-            </p>
+            <div className="flex shrink-0 items-center justify-between gap-3 px-2 py-1.5">
+              <p className="text-md font-bold tracking-wide text-accent">
+                {translate("hud.weather.place")}
+              </p>
+              <a
+                href="https://www.weatherapi.com/"
+                target="_blank"
+                rel="noreferrer"
+                className="shrink-0 text-sm text-white/50"
+              >
+                WeatherAPI.com
+              </a>
+            </div>
             {failed ? (
               <p className="px-2 py-3 text-md text-white/70">
                 {translate("hud.weather.error")}
@@ -147,30 +156,20 @@ export default function WeatherMenu() {
                     <span className="w-12 shrink-0 tabular-nums text-white/60">
                       {hour.label}
                     </span>
-                    <img src={hour.icon} alt="" className="size-5 shrink-0" />
+                    <img src={hour.icon} alt="" className="size-10 shrink-0" />
                     <span className="min-w-0 flex-1">
-                      <span className="flex items-baseline justify-between gap-3">
-                        <span className="truncate">{hour.description}</span>
-                        <span className="shrink-0 tabular-nums">
-                          {Math.round(hour.temperature)}°
-                        </span>
-                      </span>
+                      <span className="block truncate">{hour.description}</span>
                       <span className="mt-0.5 block truncate text-sm text-white/60">
                         {hourDetail(hour, translate, windKey)}
                       </span>
+                    </span>
+                    <span className="shrink-0 text-2xl leading-none tabular-nums">
+                      {Math.round(hour.temperature)}°
                     </span>
                   </div>
                 ))}
               </div>
             )}
-            <a
-              href="https://www.weatherapi.com/"
-              target="_blank"
-              rel="noreferrer"
-              className="shrink-0 px-2 pt-2 text-sm text-white/50"
-            >
-              WeatherAPI.com
-            </a>
           </Panel>
         ) : null}
       </div>
