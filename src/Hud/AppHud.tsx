@@ -6,6 +6,7 @@ import {
   House,
   Activity,
   Inbox,
+  MapPin,
   RotateCcw,
   Settings,
   TriangleAlert,
@@ -32,6 +33,10 @@ import { resetCamera, restoreCourse, showCourseHole } from "../Viewport/Hole";
 import { useCourseView } from "../Viewport/courseView";
 import Button from "../components/Button";
 import Indicator from "../components/Indicator";
+import { caddieSelf } from "../mock/caddie";
+import { useReports } from "../report/store";
+import ReportDialog from "./ReportDialog";
+import ReportHistory from "./ReportHistory";
 import WeatherMenu from "./WeatherMenu";
 import { findHole, holeName, holes, tee, type HoleInfo } from "../mock/course";
 
@@ -108,6 +113,14 @@ export default function AppHud() {
   const next = holeAt(hole, 1);
   const keyboardInset = useKeyboardInset();
   const bottom = `calc(1.25rem + env(safe-area-inset-bottom, 0px) + ${keyboardInset}px)`;
+  const [reportOpen, setReportOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const reportCount = useReports((state) => state.reports.length);
+
+  useEffect(() => {
+    if (game) setHistoryOpen(false);
+    else setReportOpen(false);
+  }, [game]);
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20 text-white">
@@ -215,6 +228,16 @@ export default function AppHud() {
       </div>
 
       <div className="pointer-events-auto absolute top-1/2 right-5 flex -translate-y-1/2 flex-col gap-2.5">
+        {game && single && hole !== caddieSelf.hole ? (
+          <Button
+            size="rail"
+            variant="outline"
+            icon={<MapPin className="size-6" />}
+            onClick={() => showCourseHole(caddieSelf.hole)}
+          >
+            {translate("caddie.return")}
+          </Button>
+        ) : null}
         {game ? (
           <>
             <Button
@@ -227,7 +250,9 @@ export default function AppHud() {
             <Button
               size="rail"
               variant="outline"
+              active={reportOpen}
               icon={<TriangleAlert className="size-6" />}
+              onClick={() => setReportOpen(true)}
             >
               {translate("hud.reportSituation")}
             </Button>
@@ -244,9 +269,17 @@ export default function AppHud() {
             <Button
               size="rail"
               variant="outline"
+              active={historyOpen}
+              className="relative"
               icon={<Inbox className="size-6" />}
+              onClick={() => setHistoryOpen((open) => !open)}
             >
               {translate("hud.reportHistory")}
+              {reportCount > 0 ? (
+                <span className="absolute top-2 right-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#ff5d6c] px-1 text-xs leading-none text-white">
+                  {reportCount}
+                </span>
+              ) : null}
             </Button>
           </>
         )}
@@ -280,6 +313,14 @@ export default function AppHud() {
             </p>
           </div>
         </div>
+      ) : null}
+
+      {game ? (
+        <ReportDialog open={reportOpen} onOpenChange={setReportOpen} />
+      ) : null}
+
+      {!game && historyOpen ? (
+        <ReportHistory onClose={() => setHistoryOpen(false)} />
       ) : null}
 
       {single ? (

@@ -6,6 +6,7 @@ import {
   CAMERA_QUATERNION,
   CAMERA_TARGET,
 } from "../constants/camera";
+import Markers from "./Markers";
 import Scene from "./Scene";
 
 function logCamera(event?: unknown) {
@@ -27,7 +28,7 @@ function logCamera(event?: unknown) {
 
 export default function Viewport() {
   return (
-    <div className="h-dvh w-full">
+    <div className="relative h-dvh w-full">
       <Canvas
         camera={{
           position: CAMERA_POSITION,
@@ -38,6 +39,7 @@ export default function Viewport() {
         }}
       >
         <Scene />
+        <Markers />
         <Environment preset="park" />
         <ambientLight intensity={3} />
         <OrbitControls

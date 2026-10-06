@@ -4,6 +4,7 @@ import {
   Box3,
   Mesh,
   MeshStandardMaterial,
+  Raycaster,
   Sphere,
   Vector3,
 } from "three";
@@ -402,6 +403,55 @@ function moveTogether(
     },
     0,
   );
+}
+
+const markerBox = new Box3();
+const markerSize = new Vector3();
+const markerPoint = new Vector3();
+const markerOrigin = new Vector3();
+const markerDown = new Vector3(0, -1, 0);
+const markerRay = new Raycaster();
+
+function surfaceHeight(group: Object3D, x: number, z: number) {
+  markerOrigin.set(x, markerBox.max.y + 40, z);
+  markerRay.set(markerOrigin, markerDown);
+  markerRay.far = markerSize.y + 120;
+
+  let height = Number.POSITIVE_INFINITY;
+  for (const hit of markerRay.intersectObject(group, true)) {
+    if ((hit.normal?.y ?? 0) <= 0.4) continue;
+    if (hit.point.y < height) height = hit.point.y;
+  }
+
+  if (!Number.isFinite(height)) height = markerBox.min.y;
+  return height + 0.35;
+}
+
+export function holeSurfacePoint(number: number, progress: number) {
+  if (!courseRoot) return null;
+
+  const group = courseRoot.children.find(
+    (child) => child.name === `Hole${number}_Group`,
+  );
+  if (!group) return null;
+
+  markerBox.setFromObject(group);
+  if (markerBox.isEmpty()) return null;
+
+  markerBox.getSize(markerSize);
+  const alongX = markerSize.x >= markerSize.z;
+  const t = Math.min(1, Math.max(0, progress));
+  const span = Math.max(markerSize.x, markerSize.z, 1);
+  const x = alongX
+    ? markerBox.min.x + markerSize.x * t
+    : (markerBox.min.x + markerBox.max.x) / 2;
+  const z = alongX
+    ? (markerBox.min.z + markerBox.max.z) / 2
+    : markerBox.min.z + markerSize.z * t;
+
+  markerPoint.set(x, surfaceHeight(group, x, z), z);
+
+  return { position: markerPoint, radius: Math.max(span * 0.045, 3) };
 }
 
 export function bindCourse(
