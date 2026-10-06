@@ -12,11 +12,11 @@
 
 @layer components {
   .glass {
-    background-color: color-mix(in srgb, var(--color-secondary) 10%, transparent);
+    background-color: color-mix(in srgb, var(--color-secondary) 30%, transparent);
   }
 
   [data-view="single"] .glass {
-    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
   }
 }
 
