@@ -14,7 +14,7 @@ export function DropdownContent({
 }: ComponentProps<typeof DropdownPrimitive.Content>) {
   return (
     <DropdownPrimitive.Portal>
-      <Panel asChild className={cn("z-50 min-w-40 p-1 outline-none", className)}>
+      <Panel asChild className={cn("z-50 min-w-40 overflow-hidden outline-none", className)}>
         <DropdownPrimitive.Content sideOffset={sideOffset} {...props} />
       </Panel>
     </DropdownPrimitive.Portal>
@@ -28,7 +28,7 @@ export function DropdownItem({
   return (
     <DropdownPrimitive.Item
       className={cn(
-        "flex cursor-pointer items-center rounded px-3 py-2 text-md outline-none select-none data-highlighted:bg-white/10 data-disabled:pointer-events-none data-disabled:opacity-50",
+        "flex cursor-pointer items-center px-3 py-2 text-md outline-none select-none data-highlighted:bg-white/10 data-disabled:pointer-events-none data-disabled:opacity-50",
         className,
       )}
       {...props}
@@ -52,7 +52,7 @@ export function DropdownSubTrigger({
   return (
     <DropdownPrimitive.SubTrigger
       className={cn(
-        "flex cursor-pointer items-center justify-between gap-3 rounded px-3 py-2 text-md outline-none select-none data-highlighted:bg-white/10 data-[state=open]:bg-white/10",
+        "flex cursor-pointer items-center justify-between gap-3 px-3 py-2 text-md outline-none select-none data-highlighted:bg-white/10 data-[state=open]:bg-white/10",
         className,
       )}
       {...props}
@@ -71,7 +71,7 @@ export function DropdownSubContent({
 }: ComponentProps<typeof DropdownPrimitive.SubContent>) {
   return (
     <DropdownPrimitive.Portal>
-      <Panel asChild className={cn("z-50 min-w-36 p-1", className)}>
+      <Panel asChild className={cn("z-50 min-w-36 overflow-hidden", className)}>
         <DropdownPrimitive.SubContent sideOffset={sideOffset} {...props} />
       </Panel>
     </DropdownPrimitive.Portal>
@@ -86,7 +86,7 @@ export function DropdownRadioItem({
   return (
     <DropdownPrimitive.RadioItem
       className={cn(
-        "flex cursor-pointer items-center gap-3 rounded px-3 py-2 text-md outline-none select-none data-highlighted:bg-white/10",
+        "flex cursor-pointer items-center gap-3 px-3 py-2 text-md outline-none select-none data-highlighted:bg-white/10",
         className,
       )}
       {...props}

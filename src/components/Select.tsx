@@ -48,7 +48,7 @@ export function SelectContent({
       <Panel
         asChild
         className={cn(
-          "z-50 max-h-64 min-w-(--radix-select-trigger-width) overflow-y-auto p-1",
+          "z-50 max-h-64 min-w-(--radix-select-trigger-width) overflow-y-auto",
           className,
         )}
       >
@@ -72,7 +72,7 @@ export function SelectItem({
   return (
     <SelectPrimitive.Item
       className={cn(
-        "flex cursor-pointer items-center rounded-xl px-3 py-2 text-md outline-none select-none data-highlighted:bg-white/10 data-[state=checked]:bg-white/15 data-disabled:pointer-events-none data-disabled:opacity-50",
+        "flex cursor-pointer items-center px-3 py-2 text-md outline-none select-none data-highlighted:bg-white/10 data-[state=checked]:bg-white/15 data-disabled:pointer-events-none data-disabled:opacity-50",
         className,
       )}
       {...props}
