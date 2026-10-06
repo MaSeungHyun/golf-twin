@@ -11,6 +11,7 @@ import {
   RotateCcw,
   Settings,
   TriangleAlert,
+  Wrench,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router";
@@ -38,6 +39,7 @@ import { caddieSelf } from "../mock/caddie";
 import { holePlay } from "../mock/play";
 import { useReports } from "../report/store";
 import CourseStatus from "./CourseStatus";
+import MachineDesk from "./MachineDesk";
 import ReportDialog from "./ReportDialog";
 import ReportHistory from "./ReportHistory";
 import ScoreSheet from "./ScoreSheet";
@@ -125,6 +127,7 @@ export default function AppHud() {
   const [recordOpen, setRecordOpen] = useState(false);
   const [courseOpen, setCourseOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [machineOpen, setMachineOpen] = useState(false);
   const reportCount = useReports((state) => state.reports.length);
 
   return (
@@ -273,6 +276,7 @@ export default function AppHud() {
               onClick={() => {
                 setCourseOpen(true);
                 setHistoryOpen(false);
+                setMachineOpen(false);
               }}
             >
               {translate("hud.courseStatus")}
@@ -286,6 +290,7 @@ export default function AppHud() {
               onClick={() => {
                 setHistoryOpen((open) => !open);
                 setCourseOpen(false);
+                setMachineOpen(false);
               }}
             >
               {translate("hud.reportHistory")}
@@ -294,6 +299,19 @@ export default function AppHud() {
                   {reportCount}
                 </span>
               ) : null}
+            </Button>
+            <Button
+              size="rail"
+              variant="outline"
+              active={machineOpen}
+              icon={<Wrench className="size-6" />}
+              onClick={() => {
+                setMachineOpen((open) => !open);
+                setHistoryOpen(false);
+                setCourseOpen(false);
+              }}
+            >
+              {translate("hud.machines")}
             </Button>
           </>
         )}
@@ -361,6 +379,10 @@ export default function AppHud() {
 
       {!game && historyOpen ? (
         <ReportHistory onClose={() => setHistoryOpen(false)} />
+      ) : null}
+
+      {!game && machineOpen ? (
+        <MachineDesk onClose={() => setMachineOpen(false)} />
       ) : null}
 
       {single ? (

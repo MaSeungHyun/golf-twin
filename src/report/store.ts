@@ -13,9 +13,10 @@ export type Report = {
   progress: number;
   note: string;
   createdAt: number;
+  resolvedAt: number | null;
 };
 
-type ReportDraft = Omit<Report, "id" | "createdAt">;
+type ReportDraft = Omit<Report, "id" | "createdAt" | "resolvedAt">;
 
 type ReportState = {
   reports: Report[];
@@ -31,6 +32,7 @@ export const useReports = create<ReportState>((set) => ({
           ...draft,
           id: `report-${Date.now()}`,
           createdAt: Date.now(),
+          resolvedAt: null,
         },
         ...state.reports,
       ],
