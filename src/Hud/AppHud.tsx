@@ -121,20 +121,11 @@ export default function AppHud() {
   const keyboardInset = useKeyboardInset();
   const bottom = `calc(1.25rem + env(safe-area-inset-bottom, 0px) + ${keyboardInset}px)`;
   const [reportOpen, setReportOpen] = useState(false);
-  const [historyOpen, setHistoryOpen] = useState(false);
-  const [statusOpen, setStatusOpen] = useState(false);
   const [scoreOpen, setScoreOpen] = useState(false);
+  const [recordOpen, setRecordOpen] = useState(false);
+  const [courseOpen, setCourseOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const reportCount = useReports((state) => state.reports.length);
-
-  useEffect(() => {
-    if (game) {
-      setHistoryOpen(false);
-      setStatusOpen(false);
-    } else {
-      setReportOpen(false);
-      setScoreOpen(false);
-    }
-  }, [game]);
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20 text-white">
@@ -256,9 +247,9 @@ export default function AppHud() {
             <Button
               size="rail"
               variant="outline"
-              active={statusOpen}
+              active={recordOpen}
               icon={<Rows3 className="size-6" />}
-              onClick={() => setStatusOpen((open) => !open)}
+              onClick={() => setRecordOpen((open) => !open)}
             >
               {translate("hud.scoreRecord")}
             </Button>
@@ -277,10 +268,10 @@ export default function AppHud() {
             <Button
               size="rail"
               variant="outline"
-              active={statusOpen}
+              active={courseOpen}
               icon={<Activity className="size-6" />}
               onClick={() => {
-                setStatusOpen(true);
+                setCourseOpen(true);
                 setHistoryOpen(false);
               }}
             >
@@ -294,7 +285,7 @@ export default function AppHud() {
               icon={<Inbox className="size-6" />}
               onClick={() => {
                 setHistoryOpen((open) => !open);
-                setStatusOpen(false);
+                setCourseOpen(false);
               }}
             >
               {translate("hud.reportHistory")}
@@ -308,7 +299,7 @@ export default function AppHud() {
         )}
       </div>
 
-      {game && statusOpen ? (
+      {game && recordOpen ? (
         <div
           className="pointer-events-none absolute inset-x-0 z-20 flex justify-center"
           style={{ bottom }}
@@ -316,7 +307,7 @@ export default function AppHud() {
           <CourseStatus
             dock
             open
-            onOpenChange={setStatusOpen}
+            onOpenChange={setRecordOpen}
             group={caddieSelf.group}
           />
         </div>
@@ -365,7 +356,7 @@ export default function AppHud() {
       ) : null}
 
       {!game ? (
-        <CourseStatus open={statusOpen} onOpenChange={setStatusOpen} />
+        <CourseStatus open={courseOpen} onOpenChange={setCourseOpen} />
       ) : null}
 
       {!game && historyOpen ? (
