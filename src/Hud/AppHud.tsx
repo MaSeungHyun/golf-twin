@@ -2,6 +2,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Rows3,
   Flag,
   House,
   Activity,
@@ -34,6 +35,7 @@ import { useCourseView } from "../Viewport/courseView";
 import Button from "../components/Button";
 import Indicator from "../components/Indicator";
 import { caddieSelf } from "../mock/caddie";
+import { holePlay } from "../mock/play";
 import { useReports } from "../report/store";
 import CourseStatus from "./CourseStatus";
 import ReportDialog from "./ReportDialog";
@@ -111,6 +113,9 @@ export default function AppHud() {
     showCourseHole(Number(value));
   };
   const current = findHole(hole);
+  const otherGroup = holePlay.find((play) => play.hole === current.number)?.group;
+  const inUseByOther =
+    otherGroup != null && otherGroup.ko !== caddieSelf.group.ko;
   const previous = holeAt(hole, -1);
   const next = holeAt(hole, 1);
   const keyboardInset = useKeyboardInset();
@@ -219,16 +224,6 @@ export default function AppHud() {
         <Button
           size="rail"
           variant="outline"
-          active={single}
-          disabled={!single}
-          icon={<Flag className="size-6" />}
-        >
-          {translate("hud.currentHole")}
-        </Button>
-
-        <Button
-          size="rail"
-          variant="outline"
           icon={<RotateCcw className="size-6" />}
           onClick={resetCamera}
         >
@@ -257,6 +252,15 @@ export default function AppHud() {
               onClick={() => setScoreOpen((open) => !open)}
             >
               {translate("hud.scoreManage")}
+            </Button>
+            <Button
+              size="rail"
+              variant="outline"
+              active={statusOpen}
+              icon={<Rows3 className="size-6" />}
+              onClick={() => setStatusOpen((open) => !open)}
+            >
+              {translate("hud.scoreRecord")}
             </Button>
             <Button
               size="rail"
@@ -304,9 +308,21 @@ export default function AppHud() {
         )}
       </div>
 
-      {single ? (
+      {game && statusOpen ? (
         <div
-          className="pointer-events-none absolute left-1/2 w-96 lg:w-104 -translate-x-1/2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-md"
+          className="pointer-events-none absolute inset-x-0 z-20 flex justify-center"
+          style={{ bottom }}
+        >
+          <CourseStatus
+            dock
+            open
+            onOpenChange={setStatusOpen}
+            group={caddieSelf.group}
+          />
+        </div>
+      ) : single ? (
+        <div
+          className="pointer-events-none absolute left-1/2 w-96 -translate-x-1/2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-md lg:w-104"
           style={{ bottom }}
         >
           {/* <p className="text-md tracking-wide text-accent font-bold">
@@ -321,6 +337,12 @@ export default function AppHud() {
               {holeName(current, locale)}
             </p>
           </div>
+          {inUseByOther && otherGroup ? (
+            <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-amber-500">
+              <span className="size-1.5 rounded-full bg-amber-500" />
+              {otherGroup[locale]} · {translate("hole.inUse")}
+            </p>
+          ) : null}
           <div className="mt-4">
             <TeeIndicators hole={current} />
             <div className="mt-2 flex items-center gap-6 text-sm text-white/70">

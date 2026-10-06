@@ -1,7 +1,9 @@
+import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Button from "../components/Button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
@@ -9,15 +11,8 @@ import {
 import type { MessageKey } from "../i18n/messages";
 import { useLocale, useTranslate } from "../i18n/store";
 import { cn } from "../lib/style";
-import { caddieSelf, type CourseZone } from "../mock/caddie";
-import { findHole, holeName } from "../mock/course";
+import { caddieSelf } from "../mock/caddie";
 import { useReports, type ReportKind, type Severity } from "../report/store";
-
-const zoneKey = {
-  tee: "caddie.zone.tee",
-  fairway: "caddie.zone.fairway",
-  green: "caddie.zone.green",
-} as const satisfies Record<CourseZone, MessageKey>;
 
 const kindKey = {
   emergency: "report.kind.emergency",
@@ -49,7 +44,6 @@ export default function ReportDialog({
   const [kind, setKind] = useState<ReportKind | null>(null);
   const [severity, setSeverity] = useState<Severity | null>(null);
   const [note, setNote] = useState("");
-  const hole = findHole(caddieSelf.hole);
   const ready = kind !== null && severity !== null;
 
   useEffect(() => {
@@ -76,13 +70,26 @@ export default function ReportDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        className="px-5 pt-4 pb-5"
         onPointerDownOutside={(event) => event.preventDefault()}
         onInteractOutside={(event) => event.preventDefault()}
       >
-        <DialogTitle>{translate("report.title")}</DialogTitle>
-        <DialogDescription>
-          {holeLabel(hole.number)} · {holeName(hole, locale)} ·{" "}
-          {translate(zoneKey[caddieSelf.zone])} · {caddieSelf.name[locale]}
+        <div className="flex items-center justify-between gap-3">
+          <DialogTitle className="font-bold">
+            {translate("report.title")}
+          </DialogTitle>
+          <DialogClose asChild>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="size-8 p-0"
+              aria-label={translate("report.close")}
+              icon={<X className="size-4" />}
+            />
+          </DialogClose>
+        </div>
+        <DialogDescription className="mt-1">
+          {holeLabel(caddieSelf.hole)} · {caddieSelf.name[locale]}
         </DialogDescription>
 
         <form
