@@ -223,7 +223,9 @@ export default function AppHud() {
           icon={<RotateCcw className="size-6" />}
           onClick={resetCamera}
         >
-          {translate("hud.resetCamera")}
+          <span className={locale === "jp" ? "whitespace-nowrap text-[11px]" : undefined}>
+            {translate("hud.resetCamera")}
+          </span>
         </Button>
       </div>
 
