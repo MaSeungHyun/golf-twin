@@ -257,10 +257,10 @@ export default function AppHud() {
           className="pointer-events-none absolute left-1/2 w-96 -translate-x-1/2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-md"
           style={{ bottom }}
         >
-          <p className="text-md tracking-wide text-accent font-bold">
+          {/* <p className="text-md tracking-wide text-accent font-bold">
             {translate("hud.currentHole")}
-          </p>
-          <div className="mt-2 flex items-baseline justify-between gap-4 font-bold">
+          </p> */}
+          <div className="flex items-baseline justify-between gap-4 font-bold">
             <p className="inline-flex items-center gap-2 text-md">
               <Flag className="size-5 text-accent" />
               {holeLabel(current.number)}
@@ -298,7 +298,10 @@ export default function AppHud() {
       ) : null}
 
       {single ? (
-        <div className="pointer-events-auto absolute right-5" style={{ bottom }}>
+        <div
+          className="pointer-events-auto absolute right-5"
+          style={{ bottom }}
+        >
           <Button
             size="sm"
             variant="outline"
