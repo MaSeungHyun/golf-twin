@@ -7,9 +7,11 @@ import { useLocale, useTranslate } from "../i18n/store";
 import { cn } from "../lib/style";
 import {
   loadTodayWeather,
+  windFlowRotation,
   type TodayWeather,
+  type WeatherHour,
   type WindCardinal,
-} from "../weather/googleWeather";
+} from "../weather/weatherApi";
 
 const windKey = {
   NORTH: "hud.wind.NORTH",
@@ -32,6 +34,7 @@ const windKey = {
 
 export default function WeatherMenu() {
   const translate = useTranslate();
+  const locale = useLocale((state) => state.locale);
   const [open, setOpen] = useState(false);
   const [weather, setWeather] = useState<TodayWeather | null>(null);
   const [failed, setFailed] = useState(false);
@@ -40,7 +43,7 @@ export default function WeatherMenu() {
   useEffect(() => {
     let cancelled = false;
 
-    loadTodayWeather(useLocale.getState().locale).then(
+    loadTodayWeather(locale).then(
       (next) => {
         if (!cancelled) setWeather(next);
       },
@@ -52,7 +55,7 @@ export default function WeatherMenu() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     if (!open) return;
@@ -90,12 +93,14 @@ export default function WeatherMenu() {
     : translate(failed ? "hud.weather.error" : "hud.weather");
   const wind =
     current?.windSpeed != null
-      ? `${Math.round(current.windSpeed)} km/h${
+      ? `${current.windSpeed.toFixed(1)} m/s${
           current.windCardinal
             ? ` · ${translate(windKey[current.windCardinal])}`
             : ""
         }`
       : null;
+  const windRotation =
+    current?.windDegrees != null ? windFlowRotation(current.windDegrees) : null;
 
   return (
     <div className="flex items-center gap-3">
@@ -106,9 +111,9 @@ export default function WeatherMenu() {
           onClick={() => setOpen((value) => !value)}
           icon={
             current ? (
-              <img src={current.icon} alt="" className="size-5" />
+              <img src={current.icon} alt="" className="size-8" />
             ) : (
-              <Sun className="size-5 text-amber-300" />
+              <Sun className="size-8 text-amber-300" />
             )
           }
           className="h-12 gap-2 rounded-full px-5 backdrop-blur-md"
@@ -116,7 +121,7 @@ export default function WeatherMenu() {
           {label}
         </Button>
         {open ? (
-          <Panel className="absolute top-full right-0 z-30 mt-2 flex max-h-80 w-72 flex-col p-2">
+          <Panel className="absolute top-full right-0 z-30 mt-2 flex max-h-96 w-96 flex-col p-2">
             <p className="shrink-0 px-2 py-1.5 text-md font-bold tracking-wide text-accent">
               {translate("hud.weather.today")} ·{" "}
               {translate("hud.weather.place")}
@@ -132,7 +137,7 @@ export default function WeatherMenu() {
               >
                 {weather?.hours.map((hour) => (
                   <div
-                    key={hour.label}
+                    key={hour.time}
                     data-current={hour.current ? "true" : undefined}
                     className={cn(
                       "flex items-center gap-2 rounded-xl px-2 py-1.5 text-md",
@@ -143,28 +148,45 @@ export default function WeatherMenu() {
                       {hour.label}
                     </span>
                     <img src={hour.icon} alt="" className="size-5 shrink-0" />
-                    <span className="min-w-0 flex-1 truncate">
-                      {hour.description}
-                    </span>
-                    {hour.precipitation > 0 ? (
-                      <span className="shrink-0 text-sm text-sky-200">
-                        {hour.precipitation}%
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-baseline justify-between gap-3">
+                        <span className="truncate">{hour.description}</span>
+                        <span className="shrink-0 tabular-nums">
+                          {Math.round(hour.temperature)}°
+                        </span>
                       </span>
-                    ) : null}
-                    <span className="w-10 shrink-0 text-right tabular-nums">
-                      {Math.round(hour.temperature)}°
+                      <span className="mt-0.5 block truncate text-sm text-white/60">
+                        {hourDetail(hour, translate, windKey)}
+                      </span>
                     </span>
                   </div>
                 ))}
               </div>
             )}
+            <a
+              href="https://www.weatherapi.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="shrink-0 px-2 pt-2 text-sm text-white/50"
+            >
+              WeatherAPI.com
+            </a>
           </Panel>
         ) : null}
       </div>
       {wind ? (
         <Button
           variant="outline"
-          icon={<Wind className="size-5" />}
+          icon={
+            <Wind
+              className="size-5"
+              style={
+                windRotation != null
+                  ? { transform: `rotate(${windRotation}deg)` }
+                  : undefined
+              }
+            />
+          }
           className="h-12 gap-2 rounded-full px-5 backdrop-blur-md"
         >
           {wind}
@@ -172,4 +194,16 @@ export default function WeatherMenu() {
       ) : null}
     </div>
   );
+}
+
+function hourDetail(
+  hour: WeatherHour,
+  translate: (key: MessageKey) => string,
+  labels: Record<WindCardinal, MessageKey>,
+) {
+  const wind =
+    hour.windSpeed == null
+      ? null
+      : `${hour.windCardinal ? `${translate(labels[hour.windCardinal])} ` : ""}${hour.windSpeed.toFixed(1)} m/s`;
+  return [`${hour.precipitation}%`, wind].filter(Boolean).join(" · ");
 }
