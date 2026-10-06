@@ -14,7 +14,7 @@ export type CaddieLocation = {
 
 export const caddieSelf: CaddieLocation = {
   id: "caddie-self",
-  name: { ko: "박지훈", jp: "パク・ジフン" },
+  name: { ko: "박지훈", jp: "佐藤 蓮" },
   group: { ko: "A조", jp: "A組" },
   hole: 14,
   zone: "fairway",
@@ -28,7 +28,7 @@ export const caddies: CaddieLocation[] = [
   caddieSelf,
   {
     id: "caddie-02",
-    name: { ko: "이수민", jp: "イ・スミン" },
+    name: { ko: "이수민", jp: "鈴木 美咲" },
     group: { ko: "B조", jp: "B組" },
     hole: 17,
     zone: "tee",
@@ -39,7 +39,7 @@ export const caddies: CaddieLocation[] = [
   },
   {
     id: "caddie-03",
-    name: { ko: "최민재", jp: "チェ・ミンジェ" },
+    name: { ko: "최민재", jp: "高橋 翔" },
     group: { ko: "C조", jp: "C組" },
     hole: 10,
     zone: "fairway",
@@ -50,7 +50,7 @@ export const caddies: CaddieLocation[] = [
   },
   {
     id: "caddie-04",
-    name: { ko: "정하은", jp: "チョン・ハウン" },
+    name: { ko: "정하은", jp: "田中 結衣" },
     group: { ko: "D조", jp: "D組" },
     hole: 12,
     zone: "fairway",
@@ -61,7 +61,7 @@ export const caddies: CaddieLocation[] = [
   },
   {
     id: "caddie-05",
-    name: { ko: "한도윤", jp: "ハン・ドユン" },
+    name: { ko: "한도윤", jp: "伊藤 大輝" },
     group: { ko: "E조", jp: "E組" },
     hole: 18,
     zone: "green",
