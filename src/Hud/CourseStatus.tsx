@@ -240,12 +240,8 @@ export default function CourseStatus({
   if (dock) {
     return (
       <Panel className="pointer-events-auto w-[min(72rem,calc(100vw-18rem))] overflow-hidden">
-        <div className="flex items-center justify-between gap-3 py-2 pr-2 pl-3">
-          <p className="text-md font-bold">{title}</p>
-          {closeButton}
-        </div>
         <div className="scroll-thumb overflow-x-auto">
-          <div className="px-3 pb-3">{table}</div>
+          <div className="px-3 py-3">{table}</div>
         </div>
       </Panel>
     );
