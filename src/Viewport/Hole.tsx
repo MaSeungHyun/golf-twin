@@ -45,6 +45,9 @@ let focusedHole = 1;
 let transition: gsap.core.Timeline | null = null;
 let transitionId = 0;
 let courseMode: CourseMode = "all";
+let skyTween: gsap.core.Tween | null = null;
+let skyTarget = 1;
+const fades = new Map<Object3D, { target: number; tween: gsap.core.Tween }>();
 
 export function isCourseSingle() {
   return courseMode === "single";
@@ -187,13 +190,18 @@ function fadeMaterials(object: Object3D) {
   return materials;
 }
 
-function fadeAmount(materials: MeshStandardMaterial[]) {
-  const material = materials[0];
-  if (!material) return 1;
+function fadeRatio(materials: MeshStandardMaterial[]) {
+  let ratio = 0;
+  let opaque = false;
 
-  const original = material.userData.fadeOriginal as FadeOriginal;
-  if (!original.opacity) return material.opacity;
-  return material.opacity / original.opacity;
+  for (const material of materials) {
+    const original = material.userData.fadeOriginal as FadeOriginal | undefined;
+    if (!original?.opacity) continue;
+    opaque = true;
+    ratio = Math.max(ratio, material.opacity / original.opacity);
+  }
+
+  return opaque ? ratio : 1;
 }
 
 function restoreObject(object: Object3D) {
@@ -228,6 +236,83 @@ function applyFade(materials: MeshStandardMaterial[], amount: number) {
   }
 }
 
+function stopCamera() {
+  transitionId += 1;
+  transition?.kill();
+  transition = null;
+}
+
+function clearFades() {
+  for (const item of fades.values()) item.tween.kill();
+  fades.clear();
+}
+
+function ensureSky(target: number) {
+  if (skyTween?.isActive() && skyTarget === target) return;
+
+  skyTween?.kill();
+  skyTarget = target;
+  const from = getSkyOpacity();
+  if (Math.abs(from - target) < 0.001) {
+    setSkyOpacity(target);
+    skyTween = null;
+    return;
+  }
+
+  const state = { opacity: from };
+  skyTween = gsap.to(state, {
+    opacity: target,
+    duration: Math.max(Math.abs(target - from), 0.001),
+    ease: "power2.inOut",
+    onUpdate: () => setSkyOpacity(state.opacity),
+  });
+}
+
+function ensureFade(object: Object3D, target: number) {
+  const running = fades.get(object);
+  if (running?.target === target && running.tween.isActive()) return;
+
+  running?.tween.kill();
+  const materials = fadeMaterials(object);
+  for (const material of materials) {
+    if (material.transparent && !material.depthWrite) continue;
+    material.transparent = true;
+    material.depthWrite = false;
+  }
+
+  const from = fadeRatio(materials);
+  if (Math.abs(from - target) < 0.001) {
+    fades.delete(object);
+    if (target === 0) {
+      applyFade(materials, 0);
+      object.visible = false;
+    } else {
+      restoreObject(object);
+    }
+    return;
+  }
+
+  object.visible = true;
+  const state = { amount: from };
+  const tween = gsap.to(state, {
+    amount: target,
+    duration: Math.max(Math.abs(target - from), 0.001),
+    ease: "power2.inOut",
+    onUpdate: () => applyFade(materials, state.amount),
+    onComplete: () => {
+      if (fades.get(object)?.tween !== tween) return;
+      fades.delete(object);
+      if (target === 0) {
+        applyFade(materials, 0);
+        object.visible = false;
+      } else {
+        restoreObject(object);
+      }
+    },
+  });
+  fades.set(object, { target, tween });
+}
+
 function frameGroup(group: Object3D, camera: PerspectiveCamera) {
   box.setFromObject(group);
   box.getCenter(center);
@@ -257,33 +342,20 @@ function moveTogether(
   reveal: boolean,
   incoming: Object3D[] = [],
 ) {
-  transition?.kill();
-  const id = ++transitionId;
+  stopCamera();
+  const id = transitionId;
   courseMode = reveal ? "all" : "single";
+  useCourseView.getState().setView(courseMode, focusedHole);
 
-  const materials = reveal ? [] : others.flatMap(fadeMaterials);
-  for (const material of materials) {
-    if (material.transparent && !material.depthWrite) continue;
-    material.transparent = true;
-    material.depthWrite = false;
-  }
   if (reveal) {
+    clearFades();
     restoreCourseObjects();
-    setSkyOpacity(1);
+    ensureSky(1);
+  } else {
+    for (const object of others) ensureFade(object, 0);
+    for (const object of incoming) ensureFade(object, 1);
+    ensureSky(0);
   }
-
-  const incomingMaterials = reveal
-    ? []
-    : incoming.flatMap((object) => {
-        object.visible = true;
-        return fadeMaterials(object);
-      });
-  for (const material of incomingMaterials) {
-    material.transparent = true;
-    material.depthWrite = false;
-    material.opacity = 0;
-  }
-  const incomingFade = { amount: 0 };
 
   const fromPosition = camera.position.clone();
   const fromTarget = controls.target.clone();
@@ -300,8 +372,6 @@ function moveTogether(
     ty: fromTarget.y,
     tz: fromTarget.z,
   };
-  const fade = { amount: fadeAmount(materials) };
-  const sky = { opacity: getSkyOpacity() };
 
   transition = gsap.timeline({
     onComplete: () => {
@@ -310,15 +380,6 @@ function moveTogether(
       transition = null;
       controls.enabled = true;
       controls.update();
-      useCourseView.getState().setView(courseMode, focusedHole);
-
-      if (reveal) {
-        restoreCourseObjects();
-        return;
-      }
-
-      for (const object of others) object.visible = false;
-      for (const object of incoming) restoreObject(object);
     },
   });
 
@@ -338,41 +399,6 @@ function moveTogether(
         controls.target.set(pose.tx, pose.ty, pose.tz);
         camera.lookAt(controls.target);
       },
-    },
-    0,
-  );
-
-  transition.to(
-    fade,
-    {
-      amount: reveal ? 1 : 0,
-      duration: 1,
-      ease: "power2.inOut",
-      onUpdate: () => applyFade(materials, fade.amount),
-    },
-    0,
-  );
-
-  if (incomingMaterials.length) {
-    transition.to(
-      incomingFade,
-      {
-        amount: 1,
-        duration: 1,
-        ease: "power2.inOut",
-        onUpdate: () => applyFade(incomingMaterials, incomingFade.amount),
-      },
-      0,
-    );
-  }
-
-  transition.to(
-    sky,
-    {
-      opacity: reveal ? 1 : 0,
-      duration: 1,
-      ease: "power2.inOut",
-      onUpdate: () => setSkyOpacity(sky.opacity),
     },
     0,
   );
@@ -406,7 +432,6 @@ export function showCourseHole(number: number) {
 
   focusedGroupName = group.name;
   focusedHole = number;
-  useCourseView.getState().setView(useCourseView.getState().mode, number);
 
   const { position, target } = frameGroup(group, activeCamera);
   singlePosition.copy(position);
@@ -472,8 +497,7 @@ function placeCamera(
 export function resetCamera() {
   if (!activeCamera || !activeControls) return;
 
-  transition?.kill();
-  transition = null;
+  stopCamera();
 
   if (courseMode === "single") {
     placeCamera(singlePosition, singleTarget);
