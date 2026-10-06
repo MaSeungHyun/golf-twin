@@ -37,6 +37,7 @@ import { caddieSelf } from "../mock/caddie";
 import { useReports } from "../report/store";
 import ReportDialog from "./ReportDialog";
 import ReportHistory from "./ReportHistory";
+import ScoreSheet from "./ScoreSheet";
 import WeatherMenu from "./WeatherMenu";
 import { findHole, holeName, holes, tee, type HoleInfo } from "../mock/course";
 
@@ -115,11 +116,15 @@ export default function AppHud() {
   const bottom = `calc(1.25rem + env(safe-area-inset-bottom, 0px) + ${keyboardInset}px)`;
   const [reportOpen, setReportOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [scoreOpen, setScoreOpen] = useState(false);
   const reportCount = useReports((state) => state.reports.length);
 
   useEffect(() => {
     if (game) setHistoryOpen(false);
-    else setReportOpen(false);
+    else {
+      setReportOpen(false);
+      setScoreOpen(false);
+    }
   }, [game]);
 
   return (
@@ -243,7 +248,9 @@ export default function AppHud() {
             <Button
               size="rail"
               variant="outline"
+              active={scoreOpen}
               icon={<ClipboardList className="size-6" />}
+              onClick={() => setScoreOpen((open) => !open)}
             >
               {translate("hud.scoreManage")}
             </Button>
@@ -317,6 +324,10 @@ export default function AppHud() {
 
       {game ? (
         <ReportDialog open={reportOpen} onOpenChange={setReportOpen} />
+      ) : null}
+
+      {game && scoreOpen ? (
+        <ScoreSheet onClose={() => setScoreOpen(false)} />
       ) : null}
 
       {!game && historyOpen ? (
