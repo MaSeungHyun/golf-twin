@@ -123,7 +123,7 @@ export default function WeatherMenu() {
         {open ? (
           <Panel className="absolute top-full right-0 z-30 mt-2 flex max-h-96 w-96 flex-col p-2">
             <div className="flex shrink-0 items-center justify-between gap-3 px-2 py-1.5">
-              <p className="text-md font-bold tracking-wide text-accent">
+              <p className="text-sm font-bold tracking-wide text-accent">
                 {translate("hud.weather.place")}
               </p>
               <a
@@ -149,21 +149,26 @@ export default function WeatherMenu() {
                     key={hour.time}
                     data-current={hour.current ? "true" : undefined}
                     className={cn(
-                      "flex items-center gap-2 rounded-xl px-2 py-1.5 text-md",
-                      hour.current && "bg-[#143528] text-[#5dffb1]",
+                      "flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm",
+                      hour.current && "bg-[#143528] text-accent",
                     )}
                   >
-                    <span className="w-12 shrink-0 tabular-nums text-white/60">
+                    <span
+                      className={cn(
+                        "w-14 shrink-0 tabular-nums",
+                        hour.current ? "text-white" : "text-white/60",
+                      )}
+                    >
                       {hour.label}
                     </span>
-                    <img src={hour.icon} alt="" className="size-10 shrink-0" />
+                    <img src={hour.icon} alt="" className="size-8 shrink-0" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate">{hour.description}</span>
                       <span className="mt-0.5 block truncate text-sm text-white/60">
                         {hourDetail(hour, translate, windKey)}
                       </span>
                     </span>
-                    <span className="shrink-0 text-2xl leading-none tabular-nums">
+                    <span className="shrink-0 text-xl leading-none tabular-nums">
                       {Math.round(hour.temperature)}°
                     </span>
                   </div>
@@ -178,7 +183,7 @@ export default function WeatherMenu() {
           variant="outline"
           icon={
             <Wind
-              className="size-5"
+              className="size-5 text-sky-500"
               style={
                 windRotation != null
                   ? { transform: `rotate(${windRotation}deg)` }
