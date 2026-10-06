@@ -8,6 +8,11 @@ import {
   Vector3,
 } from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import {
+  CAMERA_RESET_POSITION,
+  CAMERA_RESET_QUATERNION,
+  CAMERA_RESET_TARGET,
+} from "../constants/camera";
 import { useCourseView, type CourseMode } from "./courseView";
 import { getSkyOpacity, setSkyOpacity } from "./skyFade";
 
@@ -21,6 +26,8 @@ const center = new Vector3();
 const sphere = new Sphere();
 const overviewPosition = new Vector3();
 const overviewTarget = new Vector3();
+const singlePosition = new Vector3();
+const singleTarget = new Vector3();
 const focusPosition = new Vector3();
 
 type FadeOriginal = {
@@ -254,20 +261,23 @@ function moveTogether(
   const id = ++transitionId;
   courseMode = reveal ? "all" : "single";
 
-  const materials = others.flatMap(fadeMaterials);
+  const materials = reveal ? [] : others.flatMap(fadeMaterials);
   for (const material of materials) {
     if (material.transparent && !material.depthWrite) continue;
     material.transparent = true;
     material.depthWrite = false;
   }
   if (reveal) {
-    for (const object of others) object.visible = true;
+    restoreCourseObjects();
+    setSkyOpacity(1);
   }
 
-  const incomingMaterials = incoming.flatMap((object) => {
-    object.visible = true;
-    return fadeMaterials(object);
-  });
+  const incomingMaterials = reveal
+    ? []
+    : incoming.flatMap((object) => {
+        object.visible = true;
+        return fadeMaterials(object);
+      });
   for (const material of incomingMaterials) {
     material.transparent = true;
     material.depthWrite = false;
@@ -399,6 +409,8 @@ export function showCourseHole(number: number) {
   useCourseView.getState().setView(useCourseView.getState().mode, number);
 
   const { position, target } = frameGroup(group, activeCamera);
+  singlePosition.copy(position);
+  singleTarget.copy(target);
   const terrain = courseRoot.children.find((child) => child.name === "Terrain");
   const others = courseRoot.children.filter(
     (child) => child !== terrain && child !== group,
@@ -431,6 +443,46 @@ export function focusHole(
 
   bindCourse(scene, camera, controls);
   showCourseHole(Number(group.name.replace(/\D/g, "")));
+}
+
+function placeCamera(
+  position: Vector3,
+  target: Vector3,
+  quaternion?: readonly [number, number, number, number],
+) {
+  if (!activeCamera || !activeControls) return;
+
+  const camera = activeCamera;
+  const controls = activeControls;
+  const fromPosition = camera.position.clone();
+  const fromTarget = controls.target.clone();
+  controls.update();
+  camera.position.copy(fromPosition);
+  controls.target.copy(fromTarget);
+
+  camera.position.copy(position);
+  controls.target.copy(target);
+  if (quaternion) camera.quaternion.set(...quaternion);
+  else camera.lookAt(target);
+  camera.scale.set(1, 1, 1);
+  controls.enabled = true;
+  controls.update();
+}
+
+export function resetCamera() {
+  if (!activeCamera || !activeControls) return;
+
+  transition?.kill();
+  transition = null;
+
+  if (courseMode === "single") {
+    placeCamera(singlePosition, singleTarget);
+    return;
+  }
+
+  overviewPosition.set(...CAMERA_RESET_POSITION);
+  overviewTarget.set(...CAMERA_RESET_TARGET);
+  placeCamera(overviewPosition, overviewTarget, CAMERA_RESET_QUATERNION);
 }
 
 export function restoreCourse() {

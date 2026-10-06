@@ -37,41 +37,47 @@ export default function Model() {
     return () => window.removeEventListener("pointerleave", clear);
   }, []);
 
+  function pressHole(event: ThreeEvent<PointerEvent>) {
+    pressed = pickHole(event.intersections);
+    pressX = event.nativeEvent.offsetX;
+    pressY = event.nativeEvent.offsetY;
+  }
+
+  function hoverCourse(event: ThreeEvent<PointerEvent>) {
+    if (isCourseSingle()) {
+      document.body.style.cursor = "";
+      return;
+    }
+
+    const hole = pickHole(event.intersections);
+    hoverHole(hole);
+    document.body.style.cursor = hole ? "pointer" : "";
+  }
+
+  function selectHole(event: ThreeEvent<PointerEvent>) {
+    if (isCourseSingle()) return;
+
+    const hole = pickHole(event.intersections);
+    const dx = event.nativeEvent.offsetX - pressX;
+    const dy = event.nativeEvent.offsetY - pressY;
+    const controls = get().controls as OrbitControlsImpl | null;
+    if (!hole || hole !== pressed || !controls || dx * dx + dy * dy > 16) {
+      pressed = null;
+      return;
+    }
+
+    pressed = null;
+    document.body.style.cursor = "";
+    event.stopPropagation();
+    focusHole(hole, camera as PerspectiveCamera, controls);
+  }
+
   return (
     <primitive
       object={scene}
-      onPointerDown={(event: ThreeEvent<PointerEvent>) => {
-        pressed = pickHole(event.intersections);
-        pressX = event.nativeEvent.offsetX;
-        pressY = event.nativeEvent.offsetY;
-      }}
-      onPointerMove={(event: ThreeEvent<PointerEvent>) => {
-        if (isCourseSingle()) {
-          document.body.style.cursor = "";
-          return;
-        }
-
-        const hole = pickHole(event.intersections);
-        hoverHole(hole);
-        document.body.style.cursor = hole ? "pointer" : "";
-      }}
-      onPointerUp={(event: ThreeEvent<PointerEvent>) => {
-        if (isCourseSingle()) return;
-
-        const hole = pickHole(event.intersections);
-        const dx = event.nativeEvent.offsetX - pressX;
-        const dy = event.nativeEvent.offsetY - pressY;
-        const controls = get().controls as OrbitControlsImpl | null;
-        if (!hole || hole !== pressed || !controls || dx * dx + dy * dy > 16) {
-          pressed = null;
-          return;
-        }
-
-        pressed = null;
-        document.body.style.cursor = "";
-        event.stopPropagation();
-        focusHole(hole, camera as PerspectiveCamera, controls);
-      }}
+      onPointerDown={pressHole}
+      onPointerMove={hoverCourse}
+      onPointerUp={selectHole}
     />
   );
 }

@@ -1,16 +1,22 @@
 import {
-  ArrowLeft,
-  Ellipsis,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
   Flag,
   House,
-  MapPin,
-  Pencil,
+  Activity,
+  Inbox,
   RotateCcw,
   Settings,
-  Sun,
+  TriangleAlert,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
-import { NavLink } from "react-router";
+import { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router";
+import {
+  Dropdown,
+  DropdownContent,
+  DropdownTrigger,
+} from "../components/Dropdown";
 import {
   Select,
   SelectContent,
@@ -22,16 +28,12 @@ import LanguageSwitch from "../i18n/LanguageSwitch";
 import type { MessageKey } from "../i18n/messages";
 import { useLocale, useTranslate } from "../i18n/store";
 import { cn } from "../lib/style";
-import { restoreCourse, showCourseHole } from "../Viewport/Hole";
+import { resetCamera, restoreCourse, showCourseHole } from "../Viewport/Hole";
 import { useCourseView } from "../Viewport/courseView";
 import Button from "../components/Button";
-import {
-  findHole,
-  holeName,
-  holes,
-  regularTee,
-  type HoleInfo,
-} from "../mock/course";
+import Indicator from "../components/Indicator";
+import WeatherMenu from "./WeatherMenu";
+import { findHole, holeName, holes, tee, type HoleInfo } from "../mock/course";
 
 function useKeyboardInset() {
   const [inset, setInset] = useState(0);
@@ -77,8 +79,10 @@ function holeStatus(hole: HoleInfo, translate: (key: MessageKey) => string) {
 
   if (hole.water) status.push(translate("hud.water"));
   if (hole.bunkers) status.push(`${translate("hud.bunker")} ${hole.bunkers}`);
-  if (hole.elevation > 0) status.push(`${translate("hud.uphill")} ${hole.elevation}m`);
-  if (hole.elevation < 0) status.push(`${translate("hud.downhill")} ${Math.abs(hole.elevation)}m`);
+  if (hole.elevation > 0)
+    status.push(`${translate("hud.uphill")} ${hole.elevation}m`);
+  if (hole.elevation < 0)
+    status.push(`${translate("hud.downhill")} ${Math.abs(hole.elevation)}m`);
 
   return status.join(" · ");
 }
@@ -88,11 +92,19 @@ export default function AppHud() {
   const hole = useCourseView((state) => state.hole);
   const locale = useLocale((state) => state.locale);
   const translate = useTranslate();
+  const location = useLocation();
   const single = mode === "single";
+  const game = location.pathname.startsWith("/game");
 
-  const showHole = (next: number) => showCourseHole(next);
+  const showHole = (value: string) => {
+    if (value === "all") {
+      restoreCourse();
+      return;
+    }
+    showCourseHole(Number(value));
+  };
   const current = findHole(hole);
-  const tee = regularTee(current);
+  const previous = holeAt(hole, -1);
   const next = holeAt(hole, 1);
   const keyboardInset = useKeyboardInset();
   const bottom = `calc(1.25rem + env(safe-area-inset-bottom, 0px) + ${keyboardInset}px)`;
@@ -100,34 +112,20 @@ export default function AppHud() {
   return (
     <div className="pointer-events-none absolute inset-0 z-20 text-white">
       <div className="pointer-events-auto absolute top-5 left-5 flex items-center gap-3">
-        <Button
+        {/* <Button
           variant="outline"
           onClick={restoreCourse}
-          icon={<ArrowLeft className="size-4" />}
-          className="h-11 gap-1.5 rounded-full px-4 backdrop-blur-md"
+          icon={<ArrowLeft className="size-5" />}
+          className="h-12 gap-1.5 rounded-full px-4 backdrop-blur-md"
         >
           {translate("nav.back")}
-        </Button>
-        <div className="flex h-11 items-center rounded-full border border-white/10 bg-white/10 p-1 backdrop-blur-md">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              cn(
-                "inline-flex h-9 items-center rounded-full px-4 text-sm",
-                isActive
-                  ? "bg-[#143528] text-[#5dffb1] shadow-[inset_0_0_0_1px_rgba(93,255,177,0.45)]"
-                  : "text-white/75",
-              )
-            }
-          >
-            {translate("nav.home")}
-          </NavLink>
+        </Button> */}
+        <div className="glass flex h-12 items-center rounded-full border border-white/10 p-1 backdrop-blur-md">
           <NavLink
             to="/club"
             className={({ isActive }) =>
               cn(
-                "inline-flex h-9 items-center rounded-full px-4 text-sm",
+                "inline-flex h-10 items-center rounded-full px-4 text-md",
                 isActive
                   ? "bg-[#143528] text-[#5dffb1] shadow-[inset_0_0_0_1px_rgba(93,255,177,0.45)]"
                   : "text-white/75",
@@ -136,19 +134,30 @@ export default function AppHud() {
           >
             {translate("home.club")}
           </NavLink>
+          <NavLink
+            to="/game"
+            className={({ isActive }) =>
+              cn(
+                "inline-flex h-10 items-center rounded-full px-4 text-md",
+                isActive
+                  ? "bg-[#143528] text-[#5dffb1] shadow-[inset_0_0_0_1px_rgba(93,255,177,0.45)]"
+                  : "text-white/75",
+              )
+            }
+          >
+            {translate("home.game")}
+          </NavLink>
         </div>
       </div>
 
       <div className="pointer-events-auto absolute top-5 left-1/2 -translate-x-1/2">
-        <Select
-          value={String(hole)}
-          onValueChange={(value) => showHole(Number(value))}
-        >
-          <SelectTrigger className="h-11 min-w-40 rounded-full border-[#3ddc97]/35 bg-white/10 px-4 text-sm backdrop-blur-md">
-            <Flag className="size-4 text-[#3ddc97]" />
+        <Select value={single ? String(hole) : "all"} onValueChange={showHole}>
+          <SelectTrigger className="h-12 min-w-40 rounded-full border-[#3ddc97]/35 px-4 text-md backdrop-blur-md">
+            <Flag className="size-5 text-[#3ddc97]" />
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">{translate("hud.overview")}</SelectItem>
             {holes.map((item) => (
               <SelectItem key={item.number} value={String(item.number)}>
                 {holeLabel(item.number)}
@@ -159,17 +168,20 @@ export default function AppHud() {
       </div>
 
       <div className="pointer-events-auto absolute top-5 right-5 flex items-center gap-3">
-        <div className="inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 text-sm backdrop-blur-md">
-          <Sun className="size-4 text-amber-300" />
-          {translate("hud.weather")}
-        </div>
-        <LanguageSwitch className="w-28" />
-        <Button
-          variant="outline"
-          icon={<Settings className="size-4" />}
-          aria-label="settings"
-          className="size-11 rounded-full p-0 backdrop-blur-md"
-        />
+        <WeatherMenu />
+        <Dropdown>
+          <DropdownTrigger asChild>
+            <Button
+              variant="outline"
+              icon={<Settings className="size-5" />}
+              aria-label={translate("hud.settings")}
+              className="size-12 rounded-full p-0 backdrop-blur-md"
+            />
+          </DropdownTrigger>
+          <DropdownContent align="end">
+            <LanguageSwitch />
+          </DropdownContent>
+        </Dropdown>
       </div>
 
       <div className="pointer-events-auto absolute top-1/2 left-5 flex -translate-y-1/2 flex-col gap-2.5">
@@ -177,7 +189,7 @@ export default function AppHud() {
           size="rail"
           variant="outline"
           active={!single}
-          icon={<House className="size-5" />}
+          icon={<House className="size-6" />}
           onClick={restoreCourse}
         >
           {translate("hud.overview")}
@@ -187,7 +199,7 @@ export default function AppHud() {
           variant="outline"
           active={single}
           disabled={!single}
-          icon={<Flag className="size-5" />}
+          icon={<Flag className="size-6" />}
         >
           {translate("hud.currentHole")}
         </Button>
@@ -195,85 +207,120 @@ export default function AppHud() {
         <Button
           size="rail"
           variant="outline"
-          icon={<RotateCcw className="size-5" />}
+          icon={<RotateCcw className="size-6" />}
+          onClick={resetCamera}
         >
           {translate("hud.resetCamera")}
         </Button>
       </div>
 
-      <div
-        className="pointer-events-none absolute left-1/2 w-96 -translate-x-1/2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-md"
-        style={{ bottom }}
-      >
-        <p className="text-[11px] tracking-wide text-[#5dffb1]">
-          {translate(next ? "hud.nextHole" : "hud.lastHole")}
-        </p>
-        {next ? (
+      <div className="pointer-events-auto absolute top-1/2 right-5 flex -translate-y-1/2 flex-col gap-2.5">
+        {game ? (
           <>
-            <div className="mt-1 flex items-baseline justify-between gap-4">
-              <p className="text-sm">{holeLabel(next.number)}</p>
-              <p className="truncate text-sm text-white/80">{holeName(next, locale)}</p>
-            </div>
-            <div className="mt-2 flex items-center justify-between text-xs text-white/70">
-              <span>PAR {next.par}</span>
-              <span>HDCP {next.handicap}</span>
-              <span>{regularTee(next).yards} yd</span>
-            </div>
-            <p className="mt-1 text-xs leading-snug text-white/50">{holeStatus(next, translate)}</p>
+            <Button
+              size="rail"
+              variant="outline"
+              icon={<ClipboardList className="size-6" />}
+            >
+              {translate("hud.scoreManage")}
+            </Button>
+            <Button
+              size="rail"
+              variant="outline"
+              icon={<TriangleAlert className="size-6" />}
+            >
+              {translate("hud.reportSituation")}
+            </Button>
           </>
-        ) : null}
+        ) : (
+          <>
+            <Button
+              size="rail"
+              variant="outline"
+              icon={<Activity className="size-6" />}
+            >
+              {translate("hud.courseStatus")}
+            </Button>
+            <Button
+              size="rail"
+              variant="outline"
+              icon={<Inbox className="size-6" />}
+            >
+              {translate("hud.reportHistory")}
+            </Button>
+          </>
+        )}
       </div>
 
-      <div className="pointer-events-auto absolute right-5 flex flex-col items-end gap-3" style={{ bottom }}>
-        <div className="w-60 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-md">
-          <div className="flex items-center justify-between gap-3 text-sm">
-            <span className="inline-flex items-center gap-2">
-              <Flag className="size-4 text-[#3ddc97]" />
+      {single ? (
+        <div
+          className="pointer-events-none absolute left-1/2 w-96 -translate-x-1/2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-md"
+          style={{ bottom }}
+        >
+          <p className="text-md tracking-wide text-accent font-bold">
+            {translate("hud.currentHole")}
+          </p>
+          <div className="mt-2 flex items-baseline justify-between gap-4 font-bold">
+            <p className="inline-flex items-center gap-2 text-md">
+              <Flag className="size-5 text-accent" />
               {holeLabel(current.number)}
-            </span>
-            <span className="text-white/80">{tee.yards} yd</span>
+            </p>
+            <p className="truncate text-md text-white/80">
+              {holeName(current, locale)}
+            </p>
           </div>
-          <p className="mt-2 truncate text-sm text-white/60">{holeName(current, locale)}</p>
-          <div className="mt-3 flex items-center justify-between text-xs text-white/70">
-            <span>PAR {current.par}</span>
-            <span>HDCP {current.handicap}</span>
-          </div>
-          <div className="mt-3 flex justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-lg text-xs text-white/80"
-            >
-              {translate("hud.more")}
-            </Button>
+          <div className="mt-2">
+            <div className="flex items-center justify-between text-sm text-white/70">
+              <span>PAR {current.par}</span>
+              <span>HDCP {current.handicap}</span>
+            </div>
+            <TeeIndicators hole={current} />
+            <p className="mt-2 text-sm leading-snug text-white/50">
+              {holeStatus(current, translate)}
+            </p>
           </div>
         </div>
-        <div className="flex items-end gap-3">
-          <CircleButton
-            icon={<MapPin className="size-5" />}
-            label={translate("hud.poi")}
-          />
-          <CircleButton
-            icon={<Pencil className="size-5" />}
-            label={translate("hud.measure")}
-          />
-          <CircleButton icon={<Ellipsis className="size-5" />} />
+      ) : null}
+
+      {single ? (
+        <div className="pointer-events-auto absolute left-5" style={{ bottom }}>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={!previous}
+            onClick={() => previous && showHole(String(previous.number))}
+            icon={<ChevronLeft className="size-5" />}
+            className="gap-1.5"
+          >
+            {translate("hud.previousHole")}
+          </Button>
         </div>
-      </div>
+      ) : null}
+
+      {single ? (
+        <div className="pointer-events-auto absolute right-5" style={{ bottom }}>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={!next}
+            onClick={() => next && showHole(String(next.number))}
+            className="gap-1.5"
+          >
+            {translate("hud.nextHole")}
+            <ChevronRight className="size-5" />
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function CircleButton({ icon, label }: { icon: ReactNode; label?: string }) {
+function TeeIndicators({ hole }: { hole: HoleInfo }) {
   return (
-    <Button
-      variant="ghost"
-      className="h-auto flex-col gap-1.5 rounded-none px-0 text-[11px] text-white/75 hover:bg-transparent"
-    >
-      <span className="inline-flex size-12 items-center justify-center rounded-full border border-white/10 bg-white/10 backdrop-blur-md">
-        {icon}
-      </span>
-      {label}
-    </Button>
+    <div className="mt-2 flex items-center gap-4 text-sm text-white/80">
+      <Indicator color="blue">{tee(hole, "blue").yards}</Indicator>
+      <Indicator color="white">{tee(hole, "white").yards}</Indicator>
+      <Indicator color="red">{tee(hole, "red").yards}</Indicator>
+    </div>
   );
 }

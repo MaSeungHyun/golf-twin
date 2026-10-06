@@ -45,7 +45,7 @@ export function DialogDescription({
 }: ComponentProps<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      className={cn("mt-2 text-sm text-white/70", className)}
+      className={cn("mt-2 text-md text-white/70", className)}
       {...props}
     />
   );

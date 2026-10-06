@@ -39,8 +39,8 @@ export function findHole(number: number) {
   return holes.find((hole) => hole.number === number) ?? holes[0];
 }
 
-export function regularTee(hole: HoleInfo) {
-  return hole.tees.find((tee) => tee.name === "blue") ?? hole.tees[0];
+export function tee(hole: HoleInfo, name: TeeName) {
+  return hole.tees.find((item) => item.name === name) ?? hole.tees[0];
 }
 
 export function holeName(hole: HoleInfo, locale: keyof HoleName) {

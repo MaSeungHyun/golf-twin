@@ -1,8 +1,52 @@
 @import "tailwindcss";
 
+@theme {
+  --text-md: 1rem;
+  --text-md--line-height: 1.5rem;
+  --color-primary: #ffffff;
+  --color-secondary: #262626;
+  --color-accent: #5dffb1;
+  --color-accent-strong: #3ddc97;
+  --color-accent-surface: #143528;
+}
+
+@layer components {
+  .glass {
+    background-color: color-mix(in srgb, var(--color-secondary) 10%, transparent);
+  }
+
+  [data-view="single"] .glass {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  }
+}
+
 html,
 body,
 #root {
   height: 100%;
   overflow: hidden;
+}
+
+.scroll-thumb {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-primary) 55%, transparent) transparent;
+}
+
+.scroll-thumb::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background: transparent;
+}
+
+.scroll-thumb::-webkit-scrollbar-track,
+.scroll-thumb::-webkit-scrollbar-track-piece,
+.scroll-thumb::-webkit-scrollbar-corner,
+.scroll-thumb::-webkit-scrollbar-button {
+  background: transparent;
+  border: none;
+}
+
+.scroll-thumb::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 55%, transparent);
 }

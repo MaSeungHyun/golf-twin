@@ -1,14 +1,13 @@
 import { useTexture } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
-import { useLayoutEffect, useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import { useMemo } from "react";
 import { EquirectangularReflectionMapping, Euler, SRGBColorSpace } from "three";
 import { SKYBOX_ROTATION } from "../constants/skybox";
-import { bindSkyOpacity } from "./skyFade";
+import { getSkyOpacity } from "./skyFade";
 
 const HDRI_URL = "/hdri/japan_fuji.png";
 
 export default function Skybox() {
-  const scene = useThree((state) => state.scene);
   const source = useTexture(HDRI_URL);
   const texture = useMemo(() => {
     const map = source.clone();
@@ -19,9 +18,9 @@ export default function Skybox() {
   }, [source]);
   const rotation = useMemo(() => new Euler(...SKYBOX_ROTATION), []);
 
-  useLayoutEffect(() => bindSkyOpacity((opacity) => {
-    scene.backgroundIntensity = opacity;
-  }), [scene]);
+  useFrame((state) => {
+    state.scene.backgroundIntensity = getSkyOpacity();
+  });
 
   return (
     <>

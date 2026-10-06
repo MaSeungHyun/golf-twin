@@ -18,7 +18,7 @@ export default function GameHud() {
       <Button asChild size="sm" variant="outline">
         <Link to="/">{translate("nav.home")}</Link>
       </Button>
-      <p className="text-sm text-white">{translate("game.title")}</p>
+      <p className="text-md text-white">{translate("game.title")}</p>
     </div>
   );
 }
