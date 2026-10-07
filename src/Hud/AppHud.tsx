@@ -5,6 +5,7 @@ import { useReports } from "../report/store";
 import { useCourseView } from "../Viewport/courseView";
 import CourseStatus from "./_components/CourseStatus";
 import Header from "./_components/Header";
+import HoleInformation from "./_components/HoleInformation";
 import HolePager from "./_components/HolePager";
 import ViewRail from "./_components/ViewRail";
 import ClubRail from "./club/Rail";
@@ -60,12 +61,32 @@ export default function AppHud() {
         keyboardInset > 0 ? { paddingBottom: 20 + keyboardInset } : undefined
       }
     >
+      {/* 공통 */}
       <Header />
+      {single || (game && recordOpen) ? (
+        <div className="pointer-events-none absolute top-23 right-5 left-5 z-30 flex items-start gap-16">
+          <div className="mr-auto w-max shrink-0">
+            <HoleInformation />
+          </div>
+          {game && recordOpen ? (
+            <div className="w-full min-w-0 max-w-[52rem]">
+              <CourseStatus
+                dock
+                open
+                onOpenChange={setRecordOpen}
+                group={caddieSelf.group}
+              />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      <div className="pointer-events-none absolute top-1/2 left-5 z-40 -translate-y-1/2">
+        <ViewRail />
+      </div>
       <div
-        className="mt-4 flex min-h-0 flex-1 gap-5"
+        className="mt-4 flex min-h-0 flex-1 px-36"
         style={{ alignItems: "safe center" }}
       >
-        <ViewRail />
         <div className="flex h-full min-h-0 min-w-0 flex-1 items-center justify-end">
           {!game && historyOpen ? (
             <ReportHistory onClose={() => setHistoryOpen(false)} />
@@ -74,7 +95,9 @@ export default function AppHud() {
             <MachineDesk onClose={() => setMachineOpen(false)} />
           ) : null}
         </div>
-        <div className="pointer-events-auto flex shrink-0 flex-col gap-2.5">
+      </div>
+      <div className="pointer-events-none absolute top-1/2 right-5 z-40 -translate-y-1/2">
+        <div className="pointer-events-auto flex flex-col gap-2.5">
           {game ? (
             <GameRail
               recordOpen={recordOpen}
@@ -107,20 +130,6 @@ export default function AppHud() {
           )}
         </div>
       </div>
-
-      {game && recordOpen ? (
-        <div
-          className="pointer-events-none absolute left-36 right-36 z-30"
-          style={{ bottom: (single ? 72 : 20) + keyboardInset }}
-        >
-          <CourseStatus
-            dock
-            open
-            onOpenChange={setRecordOpen}
-            group={caddieSelf.group}
-          />
-        </div>
-      ) : null}
 
       {showFooter ? (
         <div className="mt-4">

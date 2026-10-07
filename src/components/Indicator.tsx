@@ -12,13 +12,17 @@ type IndicatorColor = keyof typeof colors;
 export default function Indicator({
   color,
   children,
+  className,
 }: {
   color: IndicatorColor;
   children: ReactNode;
+  className?: string;
 }) {
   return (
-    <span className="inline-flex items-center gap-1.5 tabular-nums">
-      <span className={cn("size-3 shrink-0 rounded-full", colors[color])} />
+    <span className={cn("inline-flex items-center gap-3 tabular-nums")}>
+      <span
+        className={cn("size-3 shrink-0 rounded-full", colors[color], className)}
+      />
       {children}
     </span>
   );

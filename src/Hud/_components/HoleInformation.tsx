@@ -30,7 +30,7 @@ function holeStatus(hole: HoleInfo, translate: (key: MessageKey) => string) {
 
 function TeeIndicators({ hole }: { hole: HoleInfo }) {
   return (
-    <div className="mt-2 flex items-center gap-4 text-sm text-white/80">
+    <div className="flex flex-col gap-2 text-sm text-white/80">
       <Indicator color="blue">{tee(hole, "blue").yards}</Indicator>
       <Indicator color="white">{tee(hole, "white").yards}</Indicator>
       <Indicator color="red">{tee(hole, "red").yards}</Indicator>
@@ -54,8 +54,8 @@ export default function HoleInformation() {
     otherGroup != null && otherGroup.ko !== caddieSelf.group.ko;
 
   return (
-    <div className="absolute pointer-events-none mt-24 border-none bg-transparent pl-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
-      <div className="flex items-center gap-3 font-bold">
+    <div className="pointer-events-none shrink-0 border-none bg-transparent drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+      <div className="flex items-center gap-8 font-bold">
         <p className="inline-flex items-center gap-2 text-md">
           <Icon icon={Flag} className="text-accent" />
           {holeLabel(current.number)}
@@ -68,13 +68,13 @@ export default function HoleInformation() {
           {otherGroup[locale]} · {translate("hole.inUse")}
         </p>
       ) : null}
-      <div className="mt-2">
+      <div className="mt-5 flex flex-col gap-3">
         <TeeIndicators hole={current} />
-        <div className="mt-1.5 flex items-center gap-6 text-sm text-white/70">
+        <div className="mt-1 flex items-center gap-6 text-sm text-white/70">
           <span>PAR {current.par}</span>
           <span>HDCP {current.handicap}</span>
         </div>
-        <p className="mt-1.5 text-sm leading-snug text-white/70">
+        <p className="mt-4 text-sm leading-snug text-white/70">
           {holeStatus(current, translate)}
         </p>
       </div>
