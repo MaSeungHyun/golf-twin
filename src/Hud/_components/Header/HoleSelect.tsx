@@ -10,7 +10,7 @@ import { useTranslate } from "../../../i18n/store";
 import { holes } from "../../../mock/course";
 import { restoreCourse, showCourseHole } from "../../../Viewport/Hole";
 import { useCourseView } from "../../../Viewport/courseView";
-import { holeLabel } from "../HoleInformation";
+import { holeLabel } from "../holeLabel";
 
 export default function HoleSelect() {
   const mode = useCourseView((state) => state.mode);

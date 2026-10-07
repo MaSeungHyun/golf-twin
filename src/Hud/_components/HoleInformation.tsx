@@ -7,10 +7,7 @@ import { caddieSelf } from "../../mock/caddie";
 import { findHole, holeName, tee, type HoleInfo } from "../../mock/course";
 import { holePlay } from "../../mock/play";
 import { useCourseView } from "../../Viewport/courseView";
-
-export function holeLabel(hole: number) {
-  return `HOLE ${String(hole).padStart(2, "0")}`;
-}
+import { holeLabel } from "./holeLabel";
 
 const doglegKey = {
   straight: "hud.dogleg.straight",
