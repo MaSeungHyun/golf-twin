@@ -52,7 +52,7 @@ export default function MachineDesk({ onClose }: { onClose: () => void }) {
     : null;
 
   return (
-    <Panel className="pointer-events-auto absolute top-1/2 right-40 z-20 flex max-h-[min(36rem,calc(100dvh-8rem))] w-96 -translate-y-1/2 flex-col overflow-hidden">
+    <Panel className="pointer-events-auto flex max-h-full w-96 shrink-0 flex-col overflow-hidden">
       <div className="flex items-center justify-between gap-3 py-1.5 pr-1.5 pl-4">
         <p className="text-md font-bold">{translate("hud.machines")}</p>
         <Button

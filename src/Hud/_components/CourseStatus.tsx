@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import Button from "../../components/Button";
 import {
   Dialog,
@@ -243,16 +243,14 @@ export default function CourseStatus({
 
   if (dock) {
     return (
-      <Panel className="pointer-events-auto w-[min(72rem,calc(100vw-18rem))] overflow-hidden">
-        <div className="scroll-thumb overflow-x-auto">
-          <div className="px-3 py-3">
-            <Scorecard
-              rows={rows}
-              locale={locale}
-              totalLabel={translate("course.total")}
-              onChange={setStrokes}
-            />
-          </div>
+      <Panel className="pointer-events-auto w-full overflow-hidden border-white/15 bg-[#161e1c]/70 backdrop-blur-md backdrop-brightness-100">
+        <div className="scroll-thumb overflow-x-auto px-5 py-2">
+          <Scorecard
+            rows={rows}
+            locale={locale}
+            totalLabel={translate("course.total")}
+            onChange={setStrokes}
+          />
         </div>
       </Panel>
     );
@@ -263,7 +261,7 @@ export default function CourseStatus({
       <DialogContent
         aria-describedby={undefined}
         overlayClassName="bg-black/25"
-        className="flex h-[calc(100dvh-2.5rem)] w-[calc(100vw-2.5rem)] max-w-none flex-col overflow-hidden border-white/15 bg-neutral-800/50 p-0 shadow-lg backdrop-blur-xl"
+        className="inset-5 flex h-auto w-auto max-w-none translate-none flex-col overflow-hidden border-white/15 bg-neutral-800/50 p-0 shadow-lg backdrop-blur-xl"
       >
         <div className="flex items-center justify-between gap-3 py-3 pr-2 pl-5">
           <DialogTitle className="text-xl font-bold">{title}</DialogTitle>
@@ -277,21 +275,25 @@ export default function CourseStatus({
   );
 }
 
-function columnMark(hole: number, edge: "top" | "mid" | "bottom") {
-  if (hole !== caddieSelf.hole) return "";
-  return cn(
-    "border-x border-accent",
-    edge === "top" && "border-t",
-    edge === "bottom" && "border-b",
-  );
+function strokeTotal(strokes: (number | null)[]) {
+  let total = 0;
+  let any = false;
+
+  for (const value of strokes) {
+    if (value == null) continue;
+    any = true;
+    total += value;
+  }
+
+  return any ? total : null;
 }
 
 function scoreTone(value: number | null, par: number) {
-  if (value == null) return "text-white/35";
+  if (value == null) return "text-white/30";
   const diff = value - par;
-  if (diff <= -1) return "bg-[#2f6bff] text-white";
-  if (diff === 1) return "bg-[#e0b03a] text-[#1c1404]";
-  if (diff >= 2) return "bg-[#8d5a45] text-white";
+  if (diff <= -1) return "bg-[#2f6dff] text-white";
+  if (diff === 1) return "bg-[#d4a437] text-[#1c1404]";
+  if (diff >= 2) return "bg-[#6f564c] text-white";
   return "text-white";
 }
 
@@ -307,7 +309,6 @@ function ScoreCell({
   value,
   par,
   hole,
-  edge,
   editing,
   draft,
   onDraft,
@@ -317,15 +318,16 @@ function ScoreCell({
   value: number | null;
   par: number;
   hole: number;
-  edge: "mid" | "bottom";
   editing: boolean;
   draft: string;
   onDraft: (draft: string) => void;
   onOpen: () => void;
   onClose: (save: boolean) => void;
 }) {
+  const marked = value != null && value !== par;
+
   return (
-    <td className={cn("px-1 py-1.5 text-center", columnMark(hole, edge))}>
+    <td className="px-0 py-0.5 text-center">
       {editing ? (
         <input
           autoFocus
@@ -341,7 +343,7 @@ function ScoreCell({
             event.preventDefault();
             onClose(event.key === "Enter");
           }}
-          className="h-7 w-8 rounded-md bg-white/10 text-center text-sm font-semibold text-white outline-none"
+          className="h-6 w-7 rounded-md bg-white/10 text-center text-sm font-semibold text-white outline-none"
         />
       ) : (
         <button
@@ -349,11 +351,12 @@ function ScoreCell({
           onMouseDown={(event) => event.preventDefault()}
           onClick={onOpen}
           className={cn(
-            "inline-flex h-7 min-w-8 items-center justify-center rounded-md px-1.5 text-sm font-semibold tabular-nums",
+            "inline-flex h-6 w-7 items-center justify-center rounded-md text-sm font-semibold tabular-nums",
             scoreTone(value, par),
+            !marked && "bg-transparent",
           )}
         >
-          {value ?? "–"}
+          {value ?? "-"}
         </button>
       )}
     </td>
@@ -378,6 +381,13 @@ function Scorecard({
 }) {
   const pars = holeNumbers.map((hole) => findHole(hole).par);
   const parTotal = pars.reduce((sum, par) => sum + par, 0);
+  const currentIndex = holeNumbers.indexOf(caddieSelf.hole);
+  const nameWidth = "6.5rem";
+  const rootRef = useRef<HTMLDivElement>(null);
+  const currentRef = useRef<HTMLTableCellElement>(null);
+  const [frame, setFrame] = useState<{ left: number; width: number } | null>(
+    null,
+  );
   const [edit, setEdit] = useState<{
     key: string;
     hole: number;
@@ -400,113 +410,138 @@ function Scorecard({
     }
   };
 
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    const cell = currentRef.current;
+    if (!root || !cell) return;
+
+    const place = () => {
+      const rootBox = root.getBoundingClientRect();
+      const cellBox = cell.getBoundingClientRect();
+      setFrame({
+        left: cellBox.left - rootBox.left,
+        width: cellBox.width,
+      });
+    };
+
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [currentIndex, rows.length, locale]);
+
   return (
-    <table className="w-full border-separate border-spacing-0 text-sm">
-      <thead>
-        <tr className="text-white/55">
-          <th className="sticky left-0 z-10 bg-[#101816] px-3 py-2 text-left font-medium">
-            HOLE
-          </th>
+    <div ref={rootRef} className="relative w-full">
+      {frame ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute top-0.5 bottom-0.5 z-10 rounded-md border-2 border-accent"
+          style={{ left: frame.left, width: frame.width }}
+        />
+      ) : null}
+      <table className="w-full table-fixed border-separate border-spacing-0 text-sm">
+        <colgroup>
+          <col style={{ width: nameWidth }} />
           {holeNumbers.map((hole) => (
-            <th
-              key={hole}
-              className={cn(
-                "bg-[#101816] px-1 py-2 text-center font-medium",
-                columnMark(hole, "top"),
-                hole === caddieSelf.hole ? "text-accent" : "text-white/70",
-              )}
-            >
-              {hole}
-            </th>
+            <col key={hole} />
           ))}
-          <th className="bg-[#101816] px-3 py-2 text-center font-medium text-white/70">
-            {totalLabel}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th className="sticky left-0 z-10 bg-[#101816] px-3 py-2 text-left font-medium text-white/55">
-            PAR
-          </th>
-          {pars.map((par, index) => (
-            <td
-              key={holeNumbers[index]}
-              className={cn(
-                "bg-[#101816] px-1 py-2 text-center text-white/70 tabular-nums",
-                columnMark(holeNumbers[index], "mid"),
-              )}
-            >
-              {par}
-            </td>
-          ))}
-          <td className="bg-[#101816] px-3 py-2 text-center font-semibold text-white/70 tabular-nums">
-            {parTotal}
-          </td>
-        </tr>
-        {rows.map((row, index) => {
-          const total = totalToPar(row.strokes);
-          const last = index === rows.length - 1;
-          return (
-            <tr key={row.key}>
-              <th className="sticky left-0 z-10 bg-[#16201c] px-3 py-1.5 text-left font-medium text-white">
-                {row.name[locale]}
-              </th>
-              {row.strokes.map((strokes, strokeIndex) => {
-                const hole = holeNumbers[strokeIndex];
-                const editing = edit?.key === row.key && edit.hole === hole;
-                return (
-                  <ScoreCell
-                    key={hole}
-                    value={strokes}
-                    par={pars[strokeIndex]}
-                    hole={hole}
-                    edge={last ? "bottom" : "mid"}
-                    editing={editing}
-                    draft={editing ? edit.draft : ""}
-                    onDraft={(draft) =>
-                      setEdit((current) =>
-                        current && current.key === row.key && current.hole === hole
-                          ? { ...current, draft }
-                          : current,
-                      )
-                    }
-                    onOpen={() => {
-                      if (
-                        editRef.current &&
-                        (editRef.current.key !== row.key ||
-                          editRef.current.hole !== hole)
-                      ) {
-                        closeEdit(true);
-                      }
-                      const next = {
-                        key: row.key,
-                        hole,
-                        draft: strokes == null ? "" : String(strokes),
-                      };
-                      editRef.current = next;
-                      setEdit(next);
-                    }}
-                    onClose={closeEdit}
-                  />
-                );
-              })}
-              <td
+          <col style={{ width: "4rem" }} />
+        </colgroup>
+        <thead>
+          <tr className="h-7 text-white/45">
+            <th className="px-2 text-left font-medium tracking-wide">HOLE</th>
+            {holeNumbers.map((hole) => (
+              <th
+                key={hole}
+                ref={hole === caddieSelf.hole ? currentRef : undefined}
                 className={cn(
-                  "bg-[#16201c] px-3 py-1.5 text-center font-semibold tabular-nums",
-                  total == null
-                    ? "text-white/35"
-                    : total < 0
-                      ? "text-accent"
-                      : "text-white",
+                  "text-center font-medium",
+                  hole === caddieSelf.hole ? "text-white" : "text-white/55",
                 )}
               >
-                {total == null ? "—" : formatTotal(total)}
+                {hole}
+              </th>
+            ))}
+            <th className="text-center font-medium tracking-wide text-white/45">
+              {totalLabel}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="h-7">
+            <th className="px-2 text-left font-medium tracking-wide text-white/45">
+              PAR
+            </th>
+            {pars.map((par, index) => (
+              <td
+                key={holeNumbers[index]}
+                className="text-center text-white/55 tabular-nums"
+              >
+                {par}
               </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+            ))}
+            <td className="text-center text-white/55 tabular-nums">{parTotal}</td>
+          </tr>
+          {rows.map((row) => {
+            const total = strokeTotal(row.strokes);
+            return (
+              <tr key={row.key} className="h-7">
+                <th className="px-2 text-left font-medium text-white">
+                  {row.name[locale]}
+                </th>
+                {row.strokes.map((strokes, strokeIndex) => {
+                  const hole = holeNumbers[strokeIndex];
+                  const editing = edit?.key === row.key && edit.hole === hole;
+                  return (
+                    <ScoreCell
+                      key={hole}
+                      value={strokes}
+                      par={pars[strokeIndex]}
+                      hole={hole}
+                      editing={editing}
+                      draft={editing ? edit.draft : ""}
+                      onDraft={(draft) =>
+                        setEdit((current) =>
+                          current &&
+                          current.key === row.key &&
+                          current.hole === hole
+                            ? { ...current, draft }
+                            : current,
+                        )
+                      }
+                      onOpen={() => {
+                        if (
+                          editRef.current &&
+                          (editRef.current.key !== row.key ||
+                            editRef.current.hole !== hole)
+                        ) {
+                          closeEdit(true);
+                        }
+                        const next = {
+                          key: row.key,
+                          hole,
+                          draft: strokes == null ? "" : String(strokes),
+                        };
+                        editRef.current = next;
+                        setEdit(next);
+                      }}
+                      onClose={closeEdit}
+                    />
+                  );
+                })}
+                <td
+                  className={cn(
+                    "text-center font-medium tabular-nums",
+                    total == null ? "text-white/30" : "text-white",
+                  )}
+                >
+                  {total ?? "-"}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }

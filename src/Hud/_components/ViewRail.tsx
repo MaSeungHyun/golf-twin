@@ -10,7 +10,7 @@ export default function ViewRail() {
   const translate = useTranslate();
 
   return (
-    <div className="pointer-events-auto absolute top-1/2 left-5 flex -translate-y-1/2 flex-col gap-2.5">
+    <div className="pointer-events-auto flex shrink-0 flex-col gap-2.5">
       <Button
         size="rail"
         variant="outline"

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { caddieSelf } from "../mock/caddie";
 import { useReports } from "../report/store";
+import { useCourseView } from "../Viewport/courseView";
 import CourseStatus from "./_components/CourseStatus";
 import Header from "./_components/Header";
 import HolePager from "./_components/HolePager";
@@ -38,9 +39,9 @@ function useKeyboardInset() {
 
 export default function AppHud() {
   const location = useLocation();
+  const single = useCourseView((state) => state.mode === "single");
   const game = location.pathname.startsWith("/game");
   const keyboardInset = useKeyboardInset();
-  const bottom = `calc(1.25rem + env(safe-area-inset-bottom, 0px) + ${keyboardInset}px)`;
   const [reportOpen, setReportOpen] = useState(false);
   const [recordOpen, setRecordOpen] = useState(false);
   const [courseOpen, setCourseOpen] = useState(false);
@@ -50,49 +51,67 @@ export default function AppHud() {
     (state) =>
       state.reports.filter((report) => report.resolvedAt == null).length,
   );
+  const showFooter = single || (game && recordOpen);
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-20 text-white">
+    <div
+      className="pointer-events-none absolute inset-0 z-20 flex flex-col p-5 pb-[max(1.25rem,env(safe-area-inset-bottom,0px))] text-white"
+      style={
+        keyboardInset > 0 ? { paddingBottom: 20 + keyboardInset } : undefined
+      }
+    >
       <Header />
-      <ViewRail />
-
-      <div className="pointer-events-auto absolute top-1/2 right-5 flex -translate-y-1/2 flex-col gap-2.5">
-        {game ? (
-          <GameRail
-            recordOpen={recordOpen}
-            reportOpen={reportOpen}
-            onToggleRecord={() => setRecordOpen((open) => !open)}
-            onOpenReport={() => setReportOpen(true)}
-          />
-        ) : (
-          <ClubRail
-            courseOpen={courseOpen}
-            historyOpen={historyOpen}
-            machineOpen={machineOpen}
-            reportCount={reportCount}
-            onOpenCourse={() => {
-              setCourseOpen(true);
-              setHistoryOpen(false);
-              setMachineOpen(false);
-            }}
-            onToggleHistory={() => {
-              setHistoryOpen((open) => !open);
-              setCourseOpen(false);
-              setMachineOpen(false);
-            }}
-            onToggleMachines={() => {
-              setMachineOpen((open) => !open);
-              setHistoryOpen(false);
-              setCourseOpen(false);
-            }}
-          />
-        )}
+      <div
+        className="mt-4 flex min-h-0 flex-1 gap-5"
+        style={{ alignItems: "safe center" }}
+      >
+        <ViewRail />
+        <div className="flex h-full min-h-0 min-w-0 flex-1 items-center justify-end">
+          {!game && historyOpen ? (
+            <ReportHistory onClose={() => setHistoryOpen(false)} />
+          ) : null}
+          {!game && machineOpen ? (
+            <MachineDesk onClose={() => setMachineOpen(false)} />
+          ) : null}
+        </div>
+        <div className="pointer-events-auto flex shrink-0 flex-col gap-2.5">
+          {game ? (
+            <GameRail
+              recordOpen={recordOpen}
+              reportOpen={reportOpen}
+              onToggleRecord={() => setRecordOpen((open) => !open)}
+              onOpenReport={() => setReportOpen(true)}
+            />
+          ) : (
+            <ClubRail
+              courseOpen={courseOpen}
+              historyOpen={historyOpen}
+              machineOpen={machineOpen}
+              reportCount={reportCount}
+              onOpenCourse={() => {
+                setCourseOpen(true);
+                setHistoryOpen(false);
+                setMachineOpen(false);
+              }}
+              onToggleHistory={() => {
+                setHistoryOpen((open) => !open);
+                setCourseOpen(false);
+                setMachineOpen(false);
+              }}
+              onToggleMachines={() => {
+                setMachineOpen((open) => !open);
+                setHistoryOpen(false);
+                setCourseOpen(false);
+              }}
+            />
+          )}
+        </div>
       </div>
 
       {game && recordOpen ? (
         <div
-          className="pointer-events-none absolute inset-x-0 z-20 flex justify-center"
-          style={{ bottom }}
+          className="pointer-events-none absolute left-36 right-36 z-30"
+          style={{ bottom: (single ? 72 : 20) + keyboardInset }}
         >
           <CourseStatus
             dock
@@ -103,6 +122,12 @@ export default function AppHud() {
         </div>
       ) : null}
 
+      {showFooter ? (
+        <div className="mt-4">
+          <HolePager />
+        </div>
+      ) : null}
+
       {game ? (
         <ReportDialog open={reportOpen} onOpenChange={setReportOpen} />
       ) : null}
@@ -110,16 +135,6 @@ export default function AppHud() {
       {!game ? (
         <CourseStatus open={courseOpen} onOpenChange={setCourseOpen} />
       ) : null}
-
-      {!game && historyOpen ? (
-        <ReportHistory onClose={() => setHistoryOpen(false)} />
-      ) : null}
-
-      {!game && machineOpen ? (
-        <MachineDesk onClose={() => setMachineOpen(false)} />
-      ) : null}
-
-      <HolePager bottom={bottom} />
     </div>
   );
 }

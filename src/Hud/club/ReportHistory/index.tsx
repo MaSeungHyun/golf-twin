@@ -88,7 +88,7 @@ export default function ReportHistory({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Panel className="pointer-events-auto absolute top-1/2 right-40 z-20 flex max-h-[min(44rem,calc(100dvh-6rem))] w-104 -translate-y-1/2 flex-col overflow-hidden">
+    <Panel className="pointer-events-auto flex max-h-full w-104 shrink-0 flex-col overflow-hidden">
       <div className="flex items-start justify-between gap-3 py-3 pr-1.5 pl-4">
         <div>
           <p className="text-lg font-bold">{translate("report.board.title")}</p>

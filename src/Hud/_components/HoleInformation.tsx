@@ -1,4 +1,5 @@
 import { Flag } from "lucide-react";
+import Icon from "../../components/Icon";
 import Indicator from "../../components/Indicator";
 import type { MessageKey } from "../../i18n/messages";
 import { useLocale, useTranslate } from "../../i18n/store";
@@ -56,13 +57,13 @@ export default function HoleInformation() {
     otherGroup != null && otherGroup.ko !== caddieSelf.group.ko;
 
   return (
-    <div className="relative mt-5 left-4 pointer-events-none border-none bg-transparent drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+    <div className="absolute pointer-events-none mt-24 border-none bg-transparent pl-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
       <div className="flex items-center gap-3 font-bold">
         <p className="inline-flex items-center gap-2 text-md">
-          <Flag className="size-5 text-accent" />
+          <Icon icon={Flag} className="text-accent" />
           {holeLabel(current.number)}
         </p>
-        <p className="text-md text-white/80">{holeName(current, locale)}</p>
+        <p className="text-lg text-white/80">{holeName(current, locale)}</p>
       </div>
       {inUseByOther && otherGroup ? (
         <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-bold text-maintenance">
