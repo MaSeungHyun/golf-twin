@@ -5,7 +5,7 @@ import { useReports } from "../report/store";
 import { useCourseView } from "../Viewport/courseView";
 import CourseStatus from "./_components/CourseStatus";
 import Header from "./_components/Header";
-import HoleInformation from "./_components/HoleInformation";
+import HoleLayout from "./_components/HoleLayout";
 import HolePager from "./_components/HolePager";
 import ViewRail from "./_components/ViewRail";
 import ClubRail from "./club/Rail";
@@ -64,21 +64,18 @@ export default function AppHud() {
       {/* 공통 */}
       <Header />
       {single || (game && recordOpen) ? (
-        <div className="pointer-events-none absolute top-23 right-5 left-5 z-30 flex items-start gap-16">
-          <div className="mr-auto w-max shrink-0">
-            <HoleInformation />
-          </div>
-          {game && recordOpen ? (
-            <div className="w-full min-w-0 max-w-[52rem]">
+        <HoleLayout
+          score={
+            game && recordOpen ? (
               <CourseStatus
                 dock
                 open
                 onOpenChange={setRecordOpen}
                 group={caddieSelf.group}
               />
-            </div>
-          ) : null}
-        </div>
+            ) : null
+          }
+        />
       ) : null}
       <div className="pointer-events-none absolute top-1/2 left-5 z-40 -translate-y-1/2">
         <ViewRail />
